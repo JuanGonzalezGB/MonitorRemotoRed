@@ -1,0 +1,11 @@
+{
+    "subnet": "192.168.0.0/24",
+    "scan_interval": 30,
+    "ping_warn_ms": 20,
+    "devices": {
+        "192.168.0.1":  {"name": "Router",        "alert_down": true},
+        "192.168.1.101": {"name": "PC-Escritorio",  "alert_down": true},
+        "192.168.1.20": {"name": "NAS-Home",       "alert_down": true},
+        "192.168.1.108": {"name": "RaspberryPi",    "alert_down": false}
+    }
+}

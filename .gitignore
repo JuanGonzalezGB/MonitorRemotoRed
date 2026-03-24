@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Sudoers generado por fix_sudo.sh (se regenera con sudo bash fix_sudo.sh)
+/etc/sudoers.d/net_monitor
+
+# Config local con IPs específicas de tu red (opcional — si lo incluís, que sea con IPs de ejemplo)
+# config.json
+
+# Editores
+.vscode/
+*.swp
+*~
+
+fix_sudo.sh
+debug.sh
