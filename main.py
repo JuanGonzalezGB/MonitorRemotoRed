@@ -8,7 +8,12 @@ import sys
 import subprocess
 import shutil
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
 SUDOERS_FILE = "/etc/sudoers.d/net_monitor"
 
 
