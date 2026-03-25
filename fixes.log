@@ -1,26 +1,30 @@
-Resumen: Problema con PyInstaller y la estructura MVC
+==============================
+FIX 1: PyInstaller y estructura MVC
+===================================
 
 Fecha: 25/03/2026
-Proyecto: MonitorRemotoRed
 Archivo clave: controller/scanner.py
 
-Situación:
-------------
-- Originalmente, el proyecto estaba todo en la raíz del repo.
-  Ej: main.py, scan_network.sh, todos los módulos en la misma carpeta.
-- El script de escaneo 'scan_network.sh' se llamaba directamente por ruta relativa:
-      subprocess.run(["bash", "scan_network.sh", subnet], ...)
-- Se aplicó MVC y se reestructuró el código en carpetas:
-      controlador/, modelo/, vista/
-- Después del cambio:
-  - El código funcionaba desde Python directamente.
-  - Al generar el ejecutable con PyInstaller, 'scan_network.sh' no se encontraba al ejecutar el .exe.
-  - Esto se debía a que PyInstaller ejecuta el programa desde un directorio temporal (sys._MEIPASS) y no desde la carpeta original.
+## Situación:
 
-Solución:
-------------
-1. Se modificó la función _script_path() en controller/scanner.py para detectar si el programa se ejecuta desde PyInstaller:
+* El proyecto original estaba todo en la raíz del repo:
 
+  * main.py, scan_network.sh y todos los módulos juntos.
+* El script 'scan_network.sh' se llamaba directamente:
+  subprocess.run(["bash", "scan_network.sh", subnet], ...)
+* Se aplicó MVC y se reestructuró el código en carpetas:
+  controlador/, modelo/, vista/
+* Después del cambio:
+
+  * El código funcionaba desde Python directamente.
+  * Al generar el ejecutable con PyInstaller, 'scan_network.sh' no se encontraba.
+  * Esto ocurre porque PyInstaller ejecuta el programa desde un directorio temporal (sys._MEIPASS).
+
+## Solución:
+
+1. Se modificó la función `_script_path()` en controller/scanner.py:
+
+```python
 def _script_path() -> str:
     # usa sys._MEIPASS si está en PyInstaller
     if getattr(sys, "frozen", False):
@@ -28,56 +32,70 @@ def _script_path() -> str:
     else:
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base, "scan_network.sh")
+```
 
-2. Explicación del fix:
-   - `getattr(sys, "frozen", False)` detecta si se está ejecutando desde PyInstaller.
-   - `sys._MEIPASS` es la carpeta temporal donde PyInstaller copia los archivos de datos al ejecutar el .exe.
-   - Esto garantiza que scan_network.sh sea encontrado correctamente tanto desde Python como desde el ejecutable.
+2. Explicación:
 
-3. PyInstaller se configuró para incluir scan_network.sh en el build:
+   * `getattr(sys, "frozen", False)` detecta ejecución desde PyInstaller.
+   * `sys._MEIPASS` es la carpeta temporal donde PyInstaller copia archivos de datos.
+   * Esto asegura que scan_network.sh se encuentre correctamente desde Python y desde el ejecutable.
 
-   pyinstaller --onedir --add-data "scan_network.sh:." main.py
+3. PyInstaller se configuró para incluir el script:
 
-Resultado:
-------------
-- El ejecutable generado en dist/main/ ahora encuentra scan_network.sh correctamente.
-- La estructura MVC se mantiene sin romper el funcionamiento.
-- Se asegura compatibilidad entre ejecución desde Python y desde PyInstaller.
+```bash
+pyinstaller --onedir --add-data "scan_network.sh:." main.py
+```
 
----------------------------------------------------------------------------------------
+## Resultados:
 
-FIX NET MONITOR - OFFLINE DEVICES
+* El ejecutable generado en dist/main/ encuentra scan_network.sh correctamente.
+* La estructura MVC se mantiene sin romper el funcionamiento.
+* Compatible con ejecución desde Python y desde PyInstaller.
 
-Problema:
-- Los dispositivos que desaparecían del scan no se marcaban como offline en la vista.
-- Antes se usaban update_device() o update_counts() desde el controller, pero estos no actualizan los que desaparecen.
+==============================
+FIX 2: Net Monitor - Dispositivos offline
+=========================================
 
-Solución:
+Archivo clave: Dashboard y ScannerController
+
+## Problema:
+
+* Los dispositivos que desaparecían del scan no se marcaban como offline.
+* Antes se usaban `update_device()` o `update_counts()` desde el controller, que no actualizan los dispositivos desaparecidos.
+
+## Solución:
+
 1. Se agregó un nuevo método en Dashboard:
 
-   def refresh_ui(self, devices: list[Device]):
-       - Actualiza o crea filas con update_device()
-       - Actualiza conteo de online/offline y último scan
-       - Recorre todas las filas existentes
-           - Si una MAC ya no está en devices, la marca offline (rojo) y desactiva ping/click
+```python
+def refresh_ui(self, devices: list[Device]):
+    # Actualiza o crea filas con update_device()
+    # Actualiza conteo de online/offline y último scan
+    # Recorre todas las filas existentes
+    # Si una MAC ya no está en devices:
+    #    - se marca offline (rojo)
+    #    - se desactiva ping/click
+```
 
 2. Se cambió la llamada desde ScannerController:
-   - Antes: controller llamaba update_counts() o update_device()
-   - Ahora: controller llama directamente a dashboard.refresh_ui(devices)
-   - Esto asegura que los desaparecidos se marquen offline
+
+   * Antes: controller llamaba a `update_counts()` o `update_device()`.
+   * Ahora: controller llama directamente a `dashboard.refresh_ui(devices)`.
+   * Esto asegura que los dispositivos desaparecidos se marquen offline correctamente.
 
 Ejemplo de uso:
 
-   scanner = ScannerController(
-       get_subnet=lambda: config.subnet,
-       interval=10,
-       on_result=dashboard.refresh_ui  # ✅ clave del fix
-   )
-   scanner.start()
+```python
+scanner = ScannerController(
+    get_subnet=lambda: config.subnet,
+    interval=10,
+    on_result=dashboard.refresh_ui  # clave del fix
+)
+scanner.start()
+```
 
-Resultados:
-- Dispositivos offline o que desaparecen del scan ahora se muestran correctamente en rojo.
-- La vista sigue mostrando online, offline y total correctamente.
-- No se rompe ninguna otra funcionalidad existente.
+## Resultados:
 
------------------------------------------------------------------------------------------
+* Dispositivos offline o desaparecidos del scan se muestran en rojo.
+* La vista mantiene conteo correcto de online, offline y total.
+* No se rompe ninguna otra funcionalidad existente.
