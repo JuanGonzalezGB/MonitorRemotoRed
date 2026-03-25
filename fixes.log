@@ -1,0 +1,35 @@
+FIX NET MONITOR - OFFLINE DEVICES
+
+Problema:
+- Los dispositivos que desaparecían del scan no se marcaban como offline en la vista.
+- Antes se usaban update_device() o update_counts() desde el controller, pero estos no actualizan los que desaparecen.
+
+Solución:
+1. Se agregó un nuevo método en Dashboard:
+
+   def refresh_ui(self, devices: list[Device]):
+       - Actualiza o crea filas con update_device()
+       - Actualiza conteo de online/offline y último scan
+       - Recorre todas las filas existentes
+           - Si una MAC ya no está en devices, la marca offline (rojo) y desactiva ping/click
+
+2. Se cambió la llamada desde ScannerController:
+   - Antes: controller llamaba update_counts() o update_device()
+   - Ahora: controller llama directamente a dashboard.refresh_ui(devices)
+   - Esto asegura que los desaparecidos se marquen offline
+
+Ejemplo de uso:
+
+   scanner = ScannerController(
+       get_subnet=lambda: config.subnet,
+       interval=10,
+       on_result=dashboard.refresh_ui  # ✅ clave del fix
+   )
+   scanner.start()
+
+Resultados:
+- Dispositivos offline o que desaparecen del scan ahora se muestran correctamente en rojo.
+- La vista sigue mostrando online, offline y total correctamente.
+- No se rompe ninguna otra funcionalidad existente.
+
+-----------------------------------------------------------------------------------------
