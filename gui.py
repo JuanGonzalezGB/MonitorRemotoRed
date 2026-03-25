@@ -50,8 +50,9 @@ class NetworkDashboard(tk.Tk):
         self._scanning = False
 
         self.title("Net Monitor")
-        self.geometry("480x320")
-        self.resizable(False, False)
+        self.geometry("480x300")
+        self.resizable(False, True)
+        #self.overrideredirect(True)
         self.configure(bg=BG)
         # Sin barra de título — comentar esta línea para desarrollo en desktop
         # self.overrideredirect(True)
