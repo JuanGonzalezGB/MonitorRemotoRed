@@ -46,52 +46,56 @@ class NumpadDialog(tk.Toplevel):
         self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
 
         tk.Label(self, text=title, bg=BG, fg=CYAN,
-                 font=F_NORMAL).pack(pady=(16, 6))
+                 font=F_SMALL).pack(pady=(8, 4))
 
         entry_frame = tk.Frame(self, bg=BORDER, padx=1, pady=1)
-        entry_frame.pack(padx=40, fill="x")
+        entry_frame.pack(padx=60, fill="x")
         self.var = tk.StringVar(value=value)
         self.entry = tk.Entry(entry_frame, textvariable=self.var,
                               bg=BG2, fg=WHITE, insertbackground=CYAN,
-                              font=("monospace", 13), relief="flat", bd=4,
+                              font=("monospace", 11), relief="flat", bd=3,
                               justify="center")
         self.entry.pack(fill="x")
         self.entry.focus_set()
         self.entry.icursor("end")
 
-        # Numpad: números + punto + /
+        # Numpad horizontal: todos en dos filas para ahorrar espacio vertical
         kb = tk.Frame(self, bg=BG)
-        kb.pack(pady=(12, 0))
+        kb.pack(pady=(8, 0))
 
         keys = [
-            ["7","8","9"],
-            ["4","5","6"],
-            ["1","2","3"],
-            [".","/","0"],
+            ["1","2","3","4","5","6","7","8","9","0"],
+            [".",".","/","⌫","Limpiar"],
         ]
-        for row in keys:
-            rf = tk.Frame(kb, bg=BG)
-            rf.pack()
-            for ch in row:
-                tk.Button(rf, text=ch, width=5, bg=BG2, fg=WHITE,
-                          font=("monospace", 11), relief="flat", bd=0,
-                          activebackground=BORDER, activeforeground=CYAN,
-                          command=lambda c=ch: self._type(c)
-                ).pack(side="left", padx=2, pady=2)
 
-        # Fila borrar
-        btm = tk.Frame(kb, bg=BG)
-        btm.pack(pady=(2,0))
-        tk.Button(btm, text="⌫", width=5, bg=BG2, fg=ORANGE,
-                  font=("monospace", 11), relief="flat", bd=0,
-                  command=self._backspace).pack(side="left", padx=2)
-        tk.Button(btm, text="Limpiar", width=10, bg=BG2, fg=MUTED,
-                  font=F_SMALL, relief="flat", bd=0,
-                  command=lambda: self.var.set("")).pack(side="left", padx=2)
+        # Fila de dígitos
+        rf1 = tk.Frame(kb, bg=BG)
+        rf1.pack()
+        for ch in ["1","2","3","4","5","6","7","8","9","0"]:
+            tk.Button(rf1, text=ch, width=3, bg=BG2, fg=WHITE,
+                      font=F_NORMAL, relief="flat", bd=0,
+                      activebackground=BORDER, activeforeground=CYAN,
+                      command=lambda c=ch: self._type(c)
+            ).pack(side="left", padx=1, pady=2)
 
-        # Botones
+        # Fila especial
+        rf2 = tk.Frame(kb, bg=BG)
+        rf2.pack(pady=(2,0))
+        for ch, fg, w, cmd in [
+            (".", WHITE, 4, lambda: self._type(".")),
+            ("/", WHITE, 4, lambda: self._type("/")),
+            ("⌫", ORANGE, 4, self._backspace),
+            ("Limpiar", MUTED, 8, lambda: self.var.set("")),
+        ]:
+            tk.Button(rf2, text=ch, width=w, bg=BG2, fg=fg,
+                      font=F_SMALL, relief="flat", bd=0,
+                      activebackground=BORDER,
+                      command=cmd
+            ).pack(side="left", padx=2)
+
+        # Botones guardar/cancelar
         bf = tk.Frame(self, bg=BG)
-        bf.pack(pady=(10,0))
+        bf.pack(pady=(10, 0))
         tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
