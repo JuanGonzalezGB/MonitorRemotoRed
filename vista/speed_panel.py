@@ -1,0 +1,122 @@
+"""
+view/speed_panel.py — panel flotante de velocidad del host
+"""
+import tkinter as tk
+from modelo.bandwidth import BandwidthMonitor
+
+BG      = "#0f0f12"
+BG2     = "#161620"
+BORDER  = "#1e1e2a"
+GREEN   = "#3ddc84"
+CYAN    = "#7fd4c1"
+MUTED   = "#4a4a5a"
+
+F_NORMAL = ("monospace", 9)
+F_SMALL  = ("monospace", 8)
+
+GRAPH_W = 440
+GRAPH_H = 60
+
+
+def fmt_kbs(kbs: float) -> str:
+    if kbs >= 1024:
+        return f"{kbs/1024:.1f} MB/s"
+    return f"{kbs:.1f} KB/s"
+
+
+class SpeedPanel(tk.Toplevel):
+    def __init__(self, parent, label: str, ip: str,
+                 mac: str, bw: BandwidthMonitor):
+        super().__init__(parent)
+        self.bw = bw
+        self.ip = ip
+        self._running = True
+
+        self.overrideredirect(True)
+        self.configure(bg=BG)
+        self.geometry(f"480x200+{parent.winfo_x()}+{parent.winfo_y()}")
+        self._build(label, mac)
+        self.grab_set()
+        self._update()
+
+    def _build(self, label: str, mac: str):
+        hdr = tk.Frame(self, bg=BG)
+        hdr.pack(fill="x", padx=10, pady=(8, 4))
+        tk.Label(hdr, text=f"{label}  {self.ip}", bg=BG, fg=CYAN,
+                 font=F_NORMAL).pack(side="left")
+        tk.Label(hdr, text=mac, bg=BG, fg=MUTED,
+                 font=F_SMALL).pack(side="left", padx=8)
+        tk.Button(hdr, text="✕", bg=BG, fg=MUTED, font=F_SMALL,
+                  relief="flat", bd=0, command=self._close).pack(side="right")
+
+        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8)
+
+        stats = tk.Frame(self, bg=BG)
+        stats.pack(fill="x", padx=10, pady=(6, 2))
+        self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=BG,
+                               fg=GREEN, font=("monospace", 10))
+        self.lbl_rx.pack(side="left", padx=(0, 20))
+        self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=BG,
+                               fg=CYAN, font=("monospace", 10))
+        self.lbl_tx.pack(side="left")
+        tk.Label(stats, text="(este equipo)", bg=BG, fg=MUTED,
+                 font=F_SMALL).pack(side="right")
+
+        self.canvas = tk.Canvas(self, width=GRAPH_W, height=GRAPH_H,
+                                bg=BG2, highlightthickness=0)
+        self.canvas.pack(padx=10, pady=(4, 0))
+
+        leg = tk.Frame(self, bg=BG)
+        leg.pack(fill="x", padx=10, pady=(4, 6))
+        tk.Label(leg, text="— descarga", bg=BG, fg=GREEN,
+                 font=F_SMALL).pack(side="left")
+        tk.Label(leg, text="— subida", bg=BG, fg=CYAN,
+                 font=F_SMALL).pack(side="left", padx=12)
+        tk.Button(leg, text="Cerrar", bg=BG2, fg=MUTED,
+                  font=F_SMALL, relief="flat", bd=0, padx=8,
+                  command=self._close).pack(side="right")
+
+    def _update(self):
+        if not self._running:
+            return
+        rx, tx = self.bw.current()
+        rx_hist, tx_hist = self.bw.history()
+        self.lbl_rx.config(text=f"↓  {fmt_kbs(rx)}")
+        self.lbl_tx.config(text=f"↑  {fmt_kbs(tx)}")
+        self._draw_graph(rx_hist, tx_hist)
+        self.after(1000, self._update)
+
+    def _draw_graph(self, rx_hist: list, tx_hist: list):
+        self.canvas.delete("all")
+        if not rx_hist and not tx_hist:
+            self.canvas.create_text(GRAPH_W // 2, GRAPH_H // 2,
+                                    text="recopilando datos...",
+                                    fill=MUTED, font=F_SMALL)
+            return
+
+        max_val = max(max(rx_hist + tx_hist), 0.1)
+
+        def draw_line(hist, color):
+            if len(hist) < 2:
+                return
+            n = len(hist)
+            pts = []
+            for i, v in enumerate(hist):
+                x = int(i / (n - 1) * (GRAPH_W - 4)) + 2
+                y = int(GRAPH_H - 4 - (v / max_val) * (GRAPH_H - 8))
+                pts.extend([x, y])
+            self.canvas.create_line(pts, fill=color, width=1, smooth=True)
+
+        for pct in [0.25, 0.5, 0.75]:
+            y = int(GRAPH_H - 4 - pct * (GRAPH_H - 8))
+            self.canvas.create_line(2, y, GRAPH_W - 2, y,
+                                    fill=BORDER, width=1)
+
+        draw_line(rx_hist, GREEN)
+        draw_line(tx_hist, CYAN)
+        self.canvas.create_text(GRAPH_W - 4, 4, text=fmt_kbs(max_val),
+                                fill=MUTED, font=F_SMALL, anchor="ne")
+
+    def _close(self):
+        self._running = False
+        self.destroy()

@@ -1,5 +1,5 @@
 """
-bandwidth.py — velocidad del host via /proc/net/dev (sin sudo)
+model/bandwidth.py — velocidad del host via /proc/net/dev (sin sudo)
 """
 import time
 import threading
