@@ -556,14 +556,27 @@ class NetworkDashboard(tk.Tk):
         finally:
             self._scanning = False
             self.after(0, lambda: self.btn_scan.config(text="Scan", state="normal"))
-
+            
     def _refresh_ui(self, devices: list[dict]):
         online  = sum(1 for d in devices if d.get("ping_ms") is not None)
         offline = len(devices) - online
+
         self.lbl_counts.config(text=f"▲{online}  ▼{offline}  total {len(devices)}")
         self.lbl_last.config(text=f"scan {datetime.now().strftime('%H:%M:%S')}")
+
+        current_macs = set()
+
+        # Actualizar los que sí están en el scan
         for d in devices:
+            mac = d["mac"]
+            current_macs.add(mac)
             self._update_row(d)
+
+        # 🔴 Marcar como offline los que desaparecieron
+        for mac, row in self.rows.items():
+            if mac not in current_macs:
+                row["dot"].config(fg=RED)
+                row["ping"].config(text="---", fg=RED)
 
     def _force_scan(self):
         threading.Thread(target=self._do_scan, daemon=True).start()
