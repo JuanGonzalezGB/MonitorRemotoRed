@@ -1,5 +1,10 @@
 """
 gui.py — Dashboard de red local para Raspberry Pi con pantalla 3.5" (480x300)
+- Nombres asociados a MAC
+- Click en IP muestra/oculta MAC
+- Click en nombre abre diálogo de renombrar
+- Click en ping abre panel de velocidad con mini gráfica
+- ⚙ configura subred
 """
 import tkinter as tk
 import threading
@@ -9,6 +14,7 @@ from datetime import datetime
 
 from parser import scan
 from state_cache import StateCache
+from bandwidth import BandwidthMonitor
 
 BG      = "#0f0f12"
 BG2     = "#161620"
@@ -30,10 +36,133 @@ COL_IP     = 15
 COL_VENDOR = 12
 COL_PING   =  6
 
+# Gráfica canvas
+GRAPH_W = 440
+GRAPH_H = 60
+
+
+def fmt_kbs(kbs: float) -> str:
+    if kbs >= 1024:
+        return f"{kbs/1024:.1f} MB/s"
+    return f"{kbs:.1f} KB/s"
+
+
+class SpeedPanel(tk.Toplevel):
+    """Panel flotante de velocidad — se abre al hacer click en el ping."""
+
+    def __init__(self, parent, label: str, ip: str, mac: str,
+                 bw: BandwidthMonitor):
+        super().__init__(parent)
+        self.bw = bw
+        self.ip = ip
+        self._running = True
+
+        self.overrideredirect(True)
+        self.configure(bg=BG)
+        self.geometry(f"480x200+{parent.winfo_x()}+{parent.winfo_y()}")
+        self._build(label, mac)
+        self.grab_set()
+        self._update()
+
+    def _build(self, label: str, mac: str):
+        # Header
+        hdr = tk.Frame(self, bg=BG)
+        hdr.pack(fill="x", padx=10, pady=(8, 4))
+        tk.Label(hdr, text=f"{label}  {self.ip}", bg=BG, fg=CYAN,
+                 font=F_NORMAL).pack(side="left")
+        tk.Label(hdr, text=mac, bg=BG, fg=MUTED,
+                 font=F_SMALL).pack(side="left", padx=8)
+        tk.Button(hdr, text="✕", bg=BG, fg=MUTED, font=F_SMALL,
+                  relief="flat", bd=0, command=self._close).pack(side="right")
+
+        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8)
+
+        # Stats actuales
+        stats = tk.Frame(self, bg=BG)
+        stats.pack(fill="x", padx=10, pady=(6, 2))
+
+        self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=BG,
+                               fg=GREEN, font=("monospace", 10))
+        self.lbl_rx.pack(side="left", padx=(0, 20))
+        self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=BG,
+                               fg=CYAN, font=("monospace", 10))
+        self.lbl_tx.pack(side="left")
+
+        tk.Label(stats, text="(este equipo)", bg=BG, fg=MUTED,
+                 font=F_SMALL).pack(side="right")
+
+        # Canvas gráfica
+        self.canvas = tk.Canvas(self, width=GRAPH_W, height=GRAPH_H,
+                                bg=BG2, highlightthickness=0)
+        self.canvas.pack(padx=10, pady=(4, 0))
+
+        # Leyenda
+        leg = tk.Frame(self, bg=BG)
+        leg.pack(fill="x", padx=10, pady=(4, 6))
+        tk.Label(leg, text="— descarga", bg=BG, fg=GREEN,
+                 font=F_SMALL).pack(side="left")
+        tk.Label(leg, text="— subida", bg=BG, fg=CYAN,
+                 font=F_SMALL).pack(side="left", padx=12)
+
+        tk.Button(leg, text="Cerrar", bg=BG2, fg=MUTED,
+                  font=F_SMALL, relief="flat", bd=0, padx=8,
+                  command=self._close).pack(side="right")
+
+    def _update(self):
+        if not self._running:
+            return
+
+        rx, tx = self.bw.current()
+        rx_hist, tx_hist = self.bw.history()
+
+        self.lbl_rx.config(text=f"↓  {fmt_kbs(rx)}")
+        self.lbl_tx.config(text=f"↑  {fmt_kbs(tx)}")
+        self._draw_graph(rx_hist, tx_hist)
+        self.after(1000, self._update)
+
+    def _draw_graph(self, rx_hist: list, tx_hist: list):
+        self.canvas.delete("all")
+        if not rx_hist and not tx_hist:
+            self.canvas.create_text(GRAPH_W // 2, GRAPH_H // 2,
+                                    text="recopilando datos...",
+                                    fill=MUTED, font=F_SMALL)
+            return
+
+        all_vals = rx_hist + tx_hist
+        max_val = max(all_vals) if all_vals else 1.0
+        max_val = max(max_val, 0.1)
+
+        def draw_line(hist, color):
+            if len(hist) < 2:
+                return
+            n = len(hist)
+            pts = []
+            for i, v in enumerate(hist):
+                x = int(i / (n - 1) * (GRAPH_W - 4)) + 2
+                y = int(GRAPH_H - 4 - (v / max_val) * (GRAPH_H - 8))
+                pts.extend([x, y])
+            self.canvas.create_line(pts, fill=color, width=1, smooth=True)
+
+        # Grid lines
+        for pct in [0.25, 0.5, 0.75]:
+            y = int(GRAPH_H - 4 - pct * (GRAPH_H - 8))
+            self.canvas.create_line(2, y, GRAPH_W - 2, y,
+                                    fill=BORDER, width=1)
+
+        draw_line(rx_hist, GREEN)
+        draw_line(tx_hist, CYAN)
+
+        # Etiqueta max
+        self.canvas.create_text(GRAPH_W - 4, 4,
+                                text=fmt_kbs(max_val),
+                                fill=MUTED, font=F_SMALL, anchor="ne")
+
+    def _close(self):
+        self._running = False
+        self.destroy()
+
 
 class NumpadDialog(tk.Toplevel):
-    """Diálogo base con teclado numérico para ingresar IPs y subredes."""
-
     def __init__(self, parent, title: str, value: str, on_save):
         super().__init__(parent)
         self.on_save = on_save
@@ -59,16 +188,9 @@ class NumpadDialog(tk.Toplevel):
         self.entry.focus_set()
         self.entry.icursor("end")
 
-        # Numpad horizontal: todos en dos filas para ahorrar espacio vertical
         kb = tk.Frame(self, bg=BG)
         kb.pack(pady=(8, 0))
 
-        keys = [
-            ["1","2","3","4","5","6","7","8","9","0"],
-            [".",".","/","⌫","Limpiar"],
-        ]
-
-        # Fila de dígitos
         rf1 = tk.Frame(kb, bg=BG)
         rf1.pack()
         for ch in ["1","2","3","4","5","6","7","8","9","0"]:
@@ -78,9 +200,8 @@ class NumpadDialog(tk.Toplevel):
                       command=lambda c=ch: self._type(c)
             ).pack(side="left", padx=1, pady=2)
 
-        # Fila especial
         rf2 = tk.Frame(kb, bg=BG)
-        rf2.pack(pady=(2,0))
+        rf2.pack(pady=(2, 0))
         for ch, fg, w, cmd in [
             (".", WHITE, 4, lambda: self._type(".")),
             ("/", WHITE, 4, lambda: self._type("/")),
@@ -89,11 +210,9 @@ class NumpadDialog(tk.Toplevel):
         ]:
             tk.Button(rf2, text=ch, width=w, bg=BG2, fg=fg,
                       font=F_SMALL, relief="flat", bd=0,
-                      activebackground=BORDER,
-                      command=cmd
+                      activebackground=BORDER, command=cmd
             ).pack(side="left", padx=2)
 
-        # Botones guardar/cancelar
         bf = tk.Frame(self, bg=BG)
         bf.pack(pady=(10, 0))
         tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
@@ -232,6 +351,7 @@ class NetworkDashboard(tk.Tk):
         self.known         = config.get("devices", {})
 
         self.cache = StateCache()
+        self.bw = BandwidthMonitor()
         self.rows: dict[str, dict] = {}
         self._scanning = False
         self._show_mac: dict[str, bool] = {}
@@ -244,22 +364,19 @@ class NetworkDashboard(tk.Tk):
         self.overrideredirect(False)
 
         self._build_ui()
+        self.bw.start()
         self._start_scan_loop()
 
     def _build_ui(self):
         hdr = tk.Frame(self, bg=BG)
         hdr.pack(fill="x", padx=8, pady=(6, 0))
-
         tk.Label(hdr, text="NET MONITOR", bg=BG, fg=CYAN,
                  font=F_TITLE).pack(side="left")
-
-        # Botón de configuración — discreto, solo un ícono de engranaje
         tk.Button(hdr, text="⚙", bg=BG, fg=MUTED,
                   font=("monospace", 11), relief="flat", bd=0,
                   activebackground=BG, activeforeground=CYAN,
                   cursor="hand2",
-                  command=self._open_subnet_config).pack(side="left", padx=(6,0))
-
+                  command=self._open_subnet_config).pack(side="left", padx=(6, 0))
         self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_time.pack(side="right")
         self.lbl_counts = tk.Label(hdr, text="escaneando...",
@@ -290,38 +407,28 @@ class NetworkDashboard(tk.Tk):
         self.lbl_last = tk.Label(ftr, text="Esperando scan...",
                                  bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_last.pack(side="left")
-
-        # Subnet actual en el footer
         self.lbl_subnet = tk.Label(ftr, text=self.subnet,
                                    bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_subnet.pack(side="left", padx=8)
-
         self.btn_scan = tk.Button(
             ftr, text="Scan", bg="#0f2520", fg=CYAN,
             font=F_SMALL, relief="flat", bd=0, padx=6,
             command=self._force_scan
         )
         self.btn_scan.pack(side="right")
-
         self._tick_clock()
 
     def _open_subnet_config(self):
-        NumpadDialog(
-            self,
-            title="Subred  (ej: 192.168.0.0/24)",
-            value=self.subnet,
-            on_save=self._save_subnet
-        )
+        NumpadDialog(self, "Subred  (ej: 192.168.0.0/24)",
+                     self.subnet, self._save_subnet)
 
     def _save_subnet(self, value: str):
-        # Validación mínima
         if "/" not in value:
             value += "/24"
         self.subnet = value
         self.config_data["subnet"] = value
         self.lbl_subnet.config(text=value)
         self._persist_config()
-        # Limpiar filas y re-escanear con la nueva subred
         for w in self.list_frame.winfo_children():
             w.destroy()
         self.rows.clear()
@@ -352,7 +459,8 @@ class NetworkDashboard(tk.Tk):
         vendor = tk.Label(frame, text="", bg=BG2, fg=MUTED,
                           font=F_SMALL, width=COL_VENDOR, anchor="w")
         ping = tk.Label(frame, text="---", bg=BG2, fg=MUTED,
-                        font=F_NORMAL, width=COL_PING, anchor="e")
+                        font=F_NORMAL, width=COL_PING, anchor="e",
+                        cursor="hand2")
 
         for w in (dot, name, lbl_ip, vendor, ping):
             w.pack(side="left", padx=1)
@@ -364,6 +472,13 @@ class NetworkDashboard(tk.Tk):
         self.rows[mac] = {"frame": frame, "dot": dot, "name": name,
                           "lbl_ip": lbl_ip, "vendor": vendor,
                           "ping": ping, "ip": "", "mac": mac}
+
+    def _open_speed(self, mac: str):
+        row = self.rows[mac]
+        ip = row["ip"]
+        info = self.known.get(mac, {})
+        label = info.get("name", ip.split(".")[-1])
+        SpeedPanel(self, label, ip, mac, self.bw)
 
     def _toggle_ip_mac(self, mac: str):
         self._show_mac[mac] = not self._show_mac.get(mac, False)
@@ -396,7 +511,6 @@ class NetworkDashboard(tk.Tk):
 
         row = self.rows[mac]
         row["ip"] = ip
-
         info = self.known.get(mac, {})
         label = info.get("name", ip.split(".")[-1])
         vendor_str = device.get("vendor", "")[:COL_VENDOR]
@@ -407,6 +521,19 @@ class NetworkDashboard(tk.Tk):
 
         if not self._show_mac.get(mac, False):
             row["lbl_ip"].config(text=ip[:COL_IP], fg=BLUE)
+
+        # Bind ping solo si es el host local
+        try:
+            local_ip = socket.gethostbyname(socket.gethostname())
+        except Exception:
+            local_ip = ""
+        ping_w = row["ping"]
+        if ip == local_ip:
+            ping_w.config(cursor="hand2")
+            ping_w.bind("<Button-1>", lambda e, m=mac: self._open_speed(m))
+        else:
+            ping_w.config(cursor="")
+            ping_w.unbind("<Button-1>")
 
         if p is None:
             row["dot"].config(fg=RED)
