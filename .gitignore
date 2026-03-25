@@ -7,7 +7,7 @@ __pycache__/
 /etc/sudoers.d/net_monitor
 
 # Config local con IPs específicas de tu red (opcional — si lo incluís, que sea con IPs de ejemplo)
-# config.json
+config.json
 
 # Editores
 .vscode/
@@ -18,4 +18,3 @@ fix_sudo.sh
 debug.sh
 
 *.jsonzz
-*.json

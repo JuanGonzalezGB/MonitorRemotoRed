@@ -1,6 +1,0 @@
-{
-    "subnet": "192.168.0.0/24",
-    "scan_interval": 7,
-    "ping_warn_ms": 20,
-    "devices": {}
-}
