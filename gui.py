@@ -1,8 +1,5 @@
 """
 gui.py — Dashboard de red local para Raspberry Pi con pantalla 3.5" (480x300)
-- Nombres asociados a MAC
-- Click en IP muestra/oculta MAC
-- Click en nombre abre diálogo de renombrar con teclado virtual
 """
 import tkinter as tk
 import threading
@@ -34,6 +31,96 @@ COL_VENDOR = 12
 COL_PING   =  6
 
 
+class NumpadDialog(tk.Toplevel):
+    """Diálogo base con teclado numérico para ingresar IPs y subredes."""
+
+    def __init__(self, parent, title: str, value: str, on_save):
+        super().__init__(parent)
+        self.on_save = on_save
+        self._build(parent, title, value)
+        self.grab_set()
+
+    def _build(self, parent, title: str, value: str):
+        self.overrideredirect(True)
+        self.configure(bg=BG)
+        self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
+
+        tk.Label(self, text=title, bg=BG, fg=CYAN,
+                 font=F_NORMAL).pack(pady=(16, 6))
+
+        entry_frame = tk.Frame(self, bg=BORDER, padx=1, pady=1)
+        entry_frame.pack(padx=40, fill="x")
+        self.var = tk.StringVar(value=value)
+        self.entry = tk.Entry(entry_frame, textvariable=self.var,
+                              bg=BG2, fg=WHITE, insertbackground=CYAN,
+                              font=("monospace", 13), relief="flat", bd=4,
+                              justify="center")
+        self.entry.pack(fill="x")
+        self.entry.focus_set()
+        self.entry.icursor("end")
+
+        # Numpad: números + punto + /
+        kb = tk.Frame(self, bg=BG)
+        kb.pack(pady=(12, 0))
+
+        keys = [
+            ["7","8","9"],
+            ["4","5","6"],
+            ["1","2","3"],
+            [".","/","0"],
+        ]
+        for row in keys:
+            rf = tk.Frame(kb, bg=BG)
+            rf.pack()
+            for ch in row:
+                tk.Button(rf, text=ch, width=5, bg=BG2, fg=WHITE,
+                          font=("monospace", 11), relief="flat", bd=0,
+                          activebackground=BORDER, activeforeground=CYAN,
+                          command=lambda c=ch: self._type(c)
+                ).pack(side="left", padx=2, pady=2)
+
+        # Fila borrar
+        btm = tk.Frame(kb, bg=BG)
+        btm.pack(pady=(2,0))
+        tk.Button(btm, text="⌫", width=5, bg=BG2, fg=ORANGE,
+                  font=("monospace", 11), relief="flat", bd=0,
+                  command=self._backspace).pack(side="left", padx=2)
+        tk.Button(btm, text="Limpiar", width=10, bg=BG2, fg=MUTED,
+                  font=F_SMALL, relief="flat", bd=0,
+                  command=lambda: self.var.set("")).pack(side="left", padx=2)
+
+        # Botones
+        bf = tk.Frame(self, bg=BG)
+        bf.pack(pady=(10,0))
+        tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
+                  font=F_SMALL, relief="flat", bd=0, padx=12,
+                  command=self.destroy).pack(side="left", padx=6)
+        tk.Button(bf, text="Guardar", bg="#0f2520", fg=CYAN,
+                  font=F_SMALL, relief="flat", bd=0, padx=12,
+                  command=self._save).pack(side="left", padx=6)
+
+        self.entry.bind("<Return>", lambda e: self._save())
+        self.entry.bind("<Escape>", lambda e: self.destroy())
+
+    def _type(self, ch: str):
+        pos = self.entry.index("insert")
+        self.var.set(self.var.get()[:pos] + ch + self.var.get()[pos:])
+        self.entry.icursor(pos + 1)
+
+    def _backspace(self):
+        pos = self.entry.index("insert")
+        if pos > 0:
+            val = self.var.get()
+            self.var.set(val[:pos-1] + val[pos:])
+            self.entry.icursor(pos - 1)
+
+    def _save(self):
+        val = self.var.get().strip()
+        if val:
+            self.on_save(val)
+        self.destroy()
+
+
 class RenameDialog(tk.Toplevel):
     KEYS = [
         list("1234567890"),
@@ -48,7 +135,6 @@ class RenameDialog(tk.Toplevel):
         self.mac = mac
         self.ip = ip
         self._uppercase = False
-
         self.overrideredirect(True)
         self.configure(bg=BG)
         self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
@@ -139,17 +225,17 @@ class NetworkDashboard(tk.Tk):
         self.subnet        = config["subnet"]
         self.scan_interval = config["scan_interval"]
         self.ping_warn     = config["ping_warn_ms"]
-        self.known         = config.get("devices", {})  # mac -> {name, ...}
+        self.known         = config.get("devices", {})
 
         self.cache = StateCache()
-        self.rows: dict[str, dict] = {}   # mac -> widgets
+        self.rows: dict[str, dict] = {}
         self._scanning = False
-        self._show_mac: dict[str, bool] = {}  # mac -> bool toggle
+        self._show_mac: dict[str, bool] = {}
 
         self.title("Net Monitor")
         self.geometry("480x300")
-        self.resizable(False, True)
-        self.maxsize(480, 320)
+        self.resizable(False, False)
+        self.maxsize(480, 300)
         self.configure(bg=BG)
         self.overrideredirect(False)
 
@@ -159,8 +245,17 @@ class NetworkDashboard(tk.Tk):
     def _build_ui(self):
         hdr = tk.Frame(self, bg=BG)
         hdr.pack(fill="x", padx=8, pady=(6, 0))
+
         tk.Label(hdr, text="NET MONITOR", bg=BG, fg=CYAN,
                  font=F_TITLE).pack(side="left")
+
+        # Botón de configuración — discreto, solo un ícono de engranaje
+        tk.Button(hdr, text="⚙", bg=BG, fg=MUTED,
+                  font=("monospace", 11), relief="flat", bd=0,
+                  activebackground=BG, activeforeground=CYAN,
+                  cursor="hand2",
+                  command=self._open_subnet_config).pack(side="left", padx=(6,0))
+
         self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_time.pack(side="right")
         self.lbl_counts = tk.Label(hdr, text="escaneando...",
@@ -191,6 +286,12 @@ class NetworkDashboard(tk.Tk):
         self.lbl_last = tk.Label(ftr, text="Esperando scan...",
                                  bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_last.pack(side="left")
+
+        # Subnet actual en el footer
+        self.lbl_subnet = tk.Label(ftr, text=self.subnet,
+                                   bg=BG, fg=MUTED, font=F_SMALL)
+        self.lbl_subnet.pack(side="left", padx=8)
+
         self.btn_scan = tk.Button(
             ftr, text="Scan", bg="#0f2520", fg=CYAN,
             font=F_SMALL, relief="flat", bd=0, padx=6,
@@ -199,6 +300,38 @@ class NetworkDashboard(tk.Tk):
         self.btn_scan.pack(side="right")
 
         self._tick_clock()
+
+    def _open_subnet_config(self):
+        NumpadDialog(
+            self,
+            title="Subred  (ej: 192.168.0.0/24)",
+            value=self.subnet,
+            on_save=self._save_subnet
+        )
+
+    def _save_subnet(self, value: str):
+        # Validación mínima
+        if "/" not in value:
+            value += "/24"
+        self.subnet = value
+        self.config_data["subnet"] = value
+        self.lbl_subnet.config(text=value)
+        self._persist_config()
+        # Limpiar filas y re-escanear con la nueva subred
+        for w in self.list_frame.winfo_children():
+            w.destroy()
+        self.rows.clear()
+        self._show_mac.clear()
+        self._force_scan()
+
+    def _persist_config(self):
+        try:
+            with open(self.config_path, "w") as f:
+                data = {k: v for k, v in self.config_data.items()
+                        if not k.startswith("_")}
+                json.dump(data, f, indent=4)
+        except Exception as e:
+            print(f"[gui] Error guardando config: {e}")
 
     def _make_row(self, mac: str):
         frame = tk.Frame(self.list_frame, bg=BG2, pady=2)
@@ -224,10 +357,9 @@ class NetworkDashboard(tk.Tk):
         lbl_ip.bind("<Button-1>", lambda e, m=mac: self._toggle_ip_mac(m))
 
         self._show_mac[mac] = False
-        self.rows[mac] = {"frame": frame, "dot": dot,
-                          "name": name, "lbl_ip": lbl_ip,
-                          "vendor": vendor, "ping": ping,
-                          "ip": "", "mac": mac}
+        self.rows[mac] = {"frame": frame, "dot": dot, "name": name,
+                          "lbl_ip": lbl_ip, "vendor": vendor,
+                          "ping": ping, "ip": "", "mac": mac}
 
     def _toggle_ip_mac(self, mac: str):
         self._show_mac[mac] = not self._show_mac.get(mac, False)
@@ -248,22 +380,13 @@ class NetworkDashboard(tk.Tk):
             self.known[mac] = {}
         self.known[mac]["name"] = name
         self.config_data["devices"] = self.known
-
-        try:
-            with open(self.config_path, "w") as f:
-                data = {k: v for k, v in self.config_data.items()
-                        if not k.startswith("_")}
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            print(f"[gui] Error guardando config: {e}")
-
+        self._persist_config()
         if mac in self.rows:
             self.rows[mac]["name"].config(text=name[:COL_NAME])
 
     def _update_row(self, device: dict):
         mac = device["mac"]
         ip  = device["ip"]
-
         if mac not in self.rows:
             self._make_row(mac)
 
@@ -278,7 +401,6 @@ class NetworkDashboard(tk.Tk):
         row["name"].config(text=label[:COL_NAME])
         row["vendor"].config(text=vendor_str)
 
-        # Respetar el toggle IP/MAC
         if not self._show_mac.get(mac, False):
             row["lbl_ip"].config(text=ip[:COL_IP], fg=BLUE)
 
