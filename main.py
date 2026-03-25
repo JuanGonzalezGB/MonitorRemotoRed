@@ -86,10 +86,14 @@ def load_config() -> dict:
         print(f"config.json no encontrado, creando con valores por defecto en {CONFIG_PATH}")
         with open(CONFIG_PATH, "w") as f:
             json.dump(DEFAULT_CONFIG, f, indent=4)
-        return DEFAULT_CONFIG
+        config = DEFAULT_CONFIG.copy()
+        config["_path"] = CONFIG_PATH
+        return config
     try:
         with open(CONFIG_PATH) as f:
-            return json.load(f)
+            config = json.load(f)
+        config["_path"] = CONFIG_PATH
+        return config
     except json.JSONDecodeError as e:
         print(f"ERROR en config.json: {e}")
         sys.exit(1)
