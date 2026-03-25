@@ -75,7 +75,7 @@ def setup_sudoers(arp_path: str):
 
 DEFAULT_CONFIG = {
     "subnet": "192.168.0.0/24",
-    "scan_interval": 30,
+    "scan_interval": 7,
     "ping_warn_ms": 20,
     "devices": {}
 }
