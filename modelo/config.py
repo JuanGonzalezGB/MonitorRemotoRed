@@ -7,7 +7,7 @@ import sys
 
 DEFAULT = {
     "subnet": "192.168.0.0/24",
-    "scan_interval": 7,
+    "scan_interval": 2,
     "ping_warn_ms": 20,
     "devices": {}
 }
