@@ -16,3 +16,6 @@ __pycache__/
 
 fix_sudo.sh
 debug.sh
+
+*.jsonzz
+*.json

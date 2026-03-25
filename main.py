@@ -73,13 +73,23 @@ def setup_sudoers(arp_path: str):
     print("Permisos configurados. No se volverá a pedir.\n")
 
 
+DEFAULT_CONFIG = {
+    "subnet": "192.168.0.0/24",
+    "scan_interval": 30,
+    "ping_warn_ms": 20,
+    "devices": {}
+}
+
+
 def load_config() -> dict:
+    if not os.path.exists(CONFIG_PATH):
+        print(f"config.json no encontrado, creando con valores por defecto en {CONFIG_PATH}")
+        with open(CONFIG_PATH, "w") as f:
+            json.dump(DEFAULT_CONFIG, f, indent=4)
+        return DEFAULT_CONFIG
     try:
         with open(CONFIG_PATH) as f:
             return json.load(f)
-    except FileNotFoundError:
-        print(f"ERROR: No se encontró config.json en {CONFIG_PATH}")
-        sys.exit(1)
     except json.JSONDecodeError as e:
         print(f"ERROR en config.json: {e}")
         sys.exit(1)
