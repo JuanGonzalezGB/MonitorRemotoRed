@@ -1,3 +1,51 @@
+Resumen: Problema con PyInstaller y la estructura MVC
+
+Fecha: 25/03/2026
+Proyecto: MonitorRemotoRed
+Archivo clave: controller/scanner.py
+
+Situación:
+------------
+- Originalmente, el proyecto estaba todo en la raíz del repo.
+  Ej: main.py, scan_network.sh, todos los módulos en la misma carpeta.
+- El script de escaneo 'scan_network.sh' se llamaba directamente por ruta relativa:
+      subprocess.run(["bash", "scan_network.sh", subnet], ...)
+- Se aplicó MVC y se reestructuró el código en carpetas:
+      controlador/, modelo/, vista/
+- Después del cambio:
+  - El código funcionaba desde Python directamente.
+  - Al generar el ejecutable con PyInstaller, 'scan_network.sh' no se encontraba al ejecutar el .exe.
+  - Esto se debía a que PyInstaller ejecuta el programa desde un directorio temporal (sys._MEIPASS) y no desde la carpeta original.
+
+Solución:
+------------
+1. Se modificó la función _script_path() en controller/scanner.py para detectar si el programa se ejecuta desde PyInstaller:
+
+def _script_path() -> str:
+    # usa sys._MEIPASS si está en PyInstaller
+    if getattr(sys, "frozen", False):
+        base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+    else:
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, "scan_network.sh")
+
+2. Explicación del fix:
+   - `getattr(sys, "frozen", False)` detecta si se está ejecutando desde PyInstaller.
+   - `sys._MEIPASS` es la carpeta temporal donde PyInstaller copia los archivos de datos al ejecutar el .exe.
+   - Esto garantiza que scan_network.sh sea encontrado correctamente tanto desde Python como desde el ejecutable.
+
+3. PyInstaller se configuró para incluir scan_network.sh en el build:
+
+   pyinstaller --onedir --add-data "scan_network.sh:." main.py
+
+Resultado:
+------------
+- El ejecutable generado en dist/main/ ahora encuentra scan_network.sh correctamente.
+- La estructura MVC se mantiene sin romper el funcionamiento.
+- Se asegura compatibilidad entre ejecución desde Python y desde PyInstaller.
+
+---------------------------------------------------------------------------------------
+
 FIX NET MONITOR - OFFLINE DEVICES
 
 Problema:
