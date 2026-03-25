@@ -1,6 +1,3 @@
-"""
-view/dashboard.py — ventana principal del dashboard
-"""
 import tkinter as tk
 from datetime import datetime
 from typing import Callable
@@ -130,8 +127,7 @@ class Dashboard(tk.Tk):
 
         self._show_mac[mac] = False
         self.rows[mac] = {"frame": frame, "dot": dot, "name": name,
-                          "lbl_ip": lbl_ip, "vendor": vendor,
-                          "ping": ping, "ip": ""}
+                          "lbl_ip": lbl_ip, "vendor": vendor, "ping": ping, "ip": ""}
 
     def update_device(self, device: Device):
         mac = device.mac
@@ -168,11 +164,33 @@ class Dashboard(tk.Tk):
                 row["ping"].config(cursor="")
                 row["ping"].unbind("<Button-1>")
 
-    def update_counts(self, devices: list[Device]):
+    # ── Nuevo fix ─────────────────────────────────────────────────────────────
+
+    def refresh_ui(self, devices: list[Device]):
+        """Actualizar todo el dashboard y marcar offline los que desaparecen"""
         online  = sum(1 for d in devices if d.online)
         offline = len(devices) - online
         self.lbl_counts.config(text=f"▲{online}  ▼{offline}  total {len(devices)}")
         self.lbl_last.config(text=f"scan {datetime.now().strftime('%H:%M:%S')}")
+
+        current_macs = {d.mac for d in devices}
+
+        # Actualizar o crear filas
+        for device in devices:
+            self.update_device(device)
+
+        # Marcar como offline los que desaparecieron
+        for mac, row in self.rows.items():
+            if mac not in current_macs:
+                row["dot"].config(fg=RED)
+                row["ping"].config(text="---", fg=RED)
+                row["ping"].config(cursor="")
+                row["ping"].unbind("<Button-1>")
+
+    # ── Resto del código (no modificado) ─────────────────────────────────────
+
+    def update_counts(self, devices: list[Device]):
+        self.refresh_ui(devices)  # puede llamarse, pero refresh_ui hace todo
 
     def set_scanning(self, scanning: bool):
         if scanning:
@@ -185,8 +203,6 @@ class Dashboard(tk.Tk):
             w.destroy()
         self.rows.clear()
         self._show_mac.clear()
-
-    # ── Acciones ──────────────────────────────────────────────────────────────
 
     def _toggle_ip_mac(self, mac: str):
         self._show_mac[mac] = not self._show_mac.get(mac, False)
