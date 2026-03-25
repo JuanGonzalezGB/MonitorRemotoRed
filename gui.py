@@ -237,8 +237,8 @@ class NetworkDashboard(tk.Tk):
         self._show_mac: dict[str, bool] = {}
 
         self.title("Net Monitor")
-        self.geometry("480x300")
-        self.resizable(False, False)
+        self.geometry("480x280")
+        self.resizable(False, True)
         self.maxsize(480, 300)
         self.configure(bg=BG)
         self.overrideredirect(False)
