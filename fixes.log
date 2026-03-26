@@ -99,3 +99,14 @@ scanner.start()
 * Dispositivos offline o desaparecidos del scan se muestran en rojo.
 * La vista mantiene conteo correcto de online, offline y total.
 * No se rompe ninguna otra funcionalidad existente.
+
+==============================
+CHANGE 1: New Defaults
+=========================================
+
+DEFAULT = {
+    "subnet": "192.168.0.0/24",
+    "scan_interval": 2,
+    "ping_warn_ms": 20,
+    "devices": {}
+}
