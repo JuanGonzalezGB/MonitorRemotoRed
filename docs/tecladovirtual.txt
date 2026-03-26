@@ -1,0 +1,170 @@
+IMPLEMENTACIÓN DE TECLADO VIRTUAL REUTILIZABLE (Tkinter)
+
+========================================================
+
+1. REQUISITOS BÁSICOS
+   ========================================================
+
+* Python 3
+* Tkinter (incluido por defecto en la mayoría de instalaciones)
+* Un widget Entry donde se escribirá el texto
+
+========================================================
+2. ESTRUCTURA RECOMENDADA DEL PROYECTO
+======================================
+
+Organiza tu proyecto así:
+
+/proyecto
+│
+├── main.py
+├── view/
+│   ├── keyboards.py   ← (este archivo)
+│   └── dialogs.py     ← (opcional)
+
+Esto permite reutilizar los teclados en cualquier parte.
+
+========================================================
+3. IMPORTAR EL TECLADO
+======================
+
+En cualquier archivo donde tengas un Entry:
+
+from view.keyboards import VirtualKeyboard, Numpad
+
+========================================================
+4. USO DEL VirtualKeyboard (texto libre)
+========================================
+
+Ejemplo básico:
+
+import tkinter as tk
+from view.keyboards import VirtualKeyboard
+
+root = tk.Tk()
+
+entry = tk.Entry(root)
+entry.pack()
+
+keyboard = VirtualKeyboard(root, entry)
+keyboard.pack()
+
+root.mainloop()
+
+CLAVE:
+
+* Le pasas el Entry directamente
+* El teclado escribe automáticamente en ese Entry
+
+========================================================
+5. USO DEL Numpad (IP, números, subred)
+=======================================
+
+import tkinter as tk
+from view.keyboards import Numpad
+
+root = tk.Tk()
+
+entry = tk.Entry(root)
+entry.pack()
+
+numpad = Numpad(root, entry)
+numpad.pack()
+
+root.mainloop()
+
+========================================================
+6. CÓMO FUNCIONA INTERNAMENTE (IMPORTANTE)
+==========================================
+
+* El teclado NO usa StringVar directamente
+* Opera sobre el Entry con:
+
+  entry.insert(pos, texto)
+  entry.delete(inicio, fin)
+
+Esto lo hace:
+✔ Más simple
+✔ Más compatible
+✔ Menos propenso a bugs
+
+========================================================
+7. REUTILIZACIÓN EN CUALQUIER PARTE
+===================================
+
+Puedes usarlo en:
+
+✔ Ventanas principales
+✔ Toplevels (diálogos)
+✔ Formularios
+✔ Apps táctiles (Raspberry Pi, kioscos, etc.)
+
+Ejemplo en diálogo:
+
+dialog = tk.Toplevel(root)
+
+entry = tk.Entry(dialog)
+entry.pack()
+
+VirtualKeyboard(dialog, entry).pack()
+
+========================================================
+8. PERSONALIZACIÓN RÁPIDA
+=========================
+
+Puedes modificar en keyboards.py:
+
+* Colores:
+  BG, BG2, BORDER, etc.
+
+* Layout:
+  KEYS = [...]
+
+* Tamaño de botones:
+  width=3
+
+* Fuentes:
+  F_SMALL, F_NORMAL
+
+========================================================
+9. EXTENSIONES POSIBLES
+=======================
+
+Puedes mejorar fácilmente:
+
+* Añadir teclas especiales (Enter, Tab, @, etc.)
+* Soporte para mayúsculas visuales en botones
+* Layout tipo móvil
+* Validación de entrada (ej: IP válida)
+* Animaciones o feedback visual
+
+========================================================
+10. ERROR COMÚN A EVITAR
+========================
+
+❌ No hagas esto:
+Crear lógica del teclado dentro de cada ventana
+
+✔ Haz esto:
+Centraliza TODO en keyboards.py
+
+========================================================
+11. CONCLUSIÓN
+==============
+
+Este diseño te permite:
+
+✔ Separar UI y lógica
+✔ Reutilizar código
+✔ Mantener el proyecto limpio
+✔ Escalar sin dolor
+
+En cualquier proyecto nuevo:
+→ Copias keyboards.py
+→ Importas
+→ Conectas a un Entry
+→ Listo
+
+========================================================
+FIN
+===
