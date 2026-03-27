@@ -21,3 +21,5 @@ dist/
 build/
 
 main.spec
+
+migrate_devices.py
