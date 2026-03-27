@@ -1,3 +1,6 @@
+"""
+view/dashboard.py — ventana principal del dashboard
+"""
 import tkinter as tk
 from datetime import datetime
 from typing import Callable
@@ -6,7 +9,8 @@ from modelo.device import Device
 from modelo.config import Config
 from modelo.bandwidth import BandwidthMonitor
 from controlador.network import get_local_ip
-from vista.dialogs import RenameDialog, NumpadDialog
+from vista.dialogs import RenameDialog
+from vista.settings_dialog import SettingsDialog
 from vista.speed_panel import SpeedPanel
 
 BG      = "#0f0f12"
@@ -33,13 +37,13 @@ COL_PING   =  6
 class Dashboard(tk.Tk):
     def __init__(self, config: Config, bw: BandwidthMonitor,
                  on_force_scan: Callable,
-                 on_subnet_change: Callable[[str], None],
+                 on_settings_change: Callable[[str, int], None],
                  on_rename: Callable[[str, str], None]):
         super().__init__()
         self.config = config
         self.bw = bw
         self.on_force_scan = on_force_scan
-        self.on_subnet_change = on_subnet_change
+        self.on_settings_change = on_settings_change
         self.on_rename = on_rename
 
         self.rows: dict[str, dict] = {}
@@ -64,7 +68,7 @@ class Dashboard(tk.Tk):
         tk.Button(hdr, text="⚙", bg=BG, fg=MUTED,
                   font=("monospace", 11), relief="flat", bd=0,
                   activebackground=BG, activeforeground=CYAN, cursor="hand2",
-                  command=self._open_subnet_config).pack(side="left", padx=(6, 0))
+                  command=self._open_settings).pack(side="left", padx=(6, 0))
         self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_time.pack(side="right")
         self.lbl_counts = tk.Label(hdr, text="escaneando...",
@@ -127,7 +131,8 @@ class Dashboard(tk.Tk):
 
         self._show_mac[mac] = False
         self.rows[mac] = {"frame": frame, "dot": dot, "name": name,
-                          "lbl_ip": lbl_ip, "vendor": vendor, "ping": ping, "ip": ""}
+                          "lbl_ip": lbl_ip, "vendor": vendor,
+                          "ping": ping, "ip": ""}
 
     def update_device(self, device: Device):
         mac = device.mac
@@ -164,33 +169,11 @@ class Dashboard(tk.Tk):
                 row["ping"].config(cursor="")
                 row["ping"].unbind("<Button-1>")
 
-    # ── Nuevo fix ─────────────────────────────────────────────────────────────
-
-    def refresh_ui(self, devices: list[Device]):
-        """Actualizar todo el dashboard y marcar offline los que desaparecen"""
+    def update_counts(self, devices: list[Device]):
         online  = sum(1 for d in devices if d.online)
         offline = len(devices) - online
         self.lbl_counts.config(text=f"▲{online}  ▼{offline}  total {len(devices)}")
         self.lbl_last.config(text=f"scan {datetime.now().strftime('%H:%M:%S')}")
-
-        current_macs = {d.mac for d in devices}
-
-        # Actualizar o crear filas
-        for device in devices:
-            self.update_device(device)
-
-        # Marcar como offline los que desaparecieron
-        for mac, row in self.rows.items():
-            if mac not in current_macs:
-                row["dot"].config(fg=RED)
-                row["ping"].config(text="---", fg=RED)
-                row["ping"].config(cursor="")
-                row["ping"].unbind("<Button-1>")
-
-    # ── Resto del código (no modificado) ─────────────────────────────────────
-
-    def update_counts(self, devices: list[Device]):
-        self.refresh_ui(devices)  # puede llamarse, pero refresh_ui hace todo
 
     def set_scanning(self, scanning: bool):
         if scanning:
@@ -203,6 +186,8 @@ class Dashboard(tk.Tk):
             w.destroy()
         self.rows.clear()
         self._show_mac.clear()
+
+    # ── Acciones ──────────────────────────────────────────────────────────────
 
     def _toggle_ip_mac(self, mac: str):
         self._show_mac[mac] = not self._show_mac.get(mac, False)
@@ -227,14 +212,18 @@ class Dashboard(tk.Tk):
         label = self.config.device_name(mac) or ip.split(".")[-1]
         SpeedPanel(self, label, ip, mac, self.bw)
 
-    def _open_subnet_config(self):
-        NumpadDialog(self, "Subred  (ej: 192.168.0.0/24)",
-                     self.config.subnet, self._handle_subnet_change)
+    def _open_settings(self):
+        SettingsDialog(
+            self,
+            current_subnet=self.config.subnet,
+            current_interval=self.config.scan_interval,
+            on_save=self._handle_settings_save
+        )
 
-    def _handle_subnet_change(self, value: str):
-        self.lbl_subnet.config(text=value)
+    def _handle_settings_save(self, subnet: str, interval: int):
+        self.lbl_subnet.config(text=subnet)
         self.clear_devices()
-        self.on_subnet_change(value)
+        self.on_settings_change(subnet, interval)
 
     def _tick_clock(self):
         self.lbl_time.config(text=datetime.now().strftime("%H:%M:%S"))

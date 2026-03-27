@@ -1,3 +1,6 @@
+"""
+controller/scanner.py — ejecuta el scan y notifica a la vista via callback
+"""
 import subprocess
 import json
 import os
@@ -11,7 +14,7 @@ from modelo.device import Device
 
 def _script_path() -> str:
     if getattr(sys, "frozen", False):
-        base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+        base = os.path.dirname(sys.executable)
     else:
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base, "scan_network.sh")
@@ -72,13 +75,20 @@ class ScannerController:
     def scanning(self) -> bool:
         return self._scanning
 
+    @property
+    def interval(self) -> int:
+        return self._interval
+
+    @interval.setter
+    def interval(self, value: int):
+        self._interval = max(1, value)
+
     def _do_scan(self):
         if self._scanning:
             return
         self._scanning = True
         try:
             devices = run_scan(self._get_subnet())
-            # ✅ Llamada directa al refresh UI que hace offline correctamente
             self._on_result(devices)
         finally:
             self._scanning = False

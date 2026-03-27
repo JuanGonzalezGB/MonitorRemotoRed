@@ -23,7 +23,7 @@ def main():
         config=config,
         bw=bw,
         on_force_scan=lambda: scanner.force_scan(),
-        on_subnet_change=lambda v: _on_subnet_change(v),
+        on_settings_change=lambda s, i: _on_settings_change(s, i),
         on_rename=lambda mac, name: config.set_device_name(mac, name),
     )
 
@@ -37,8 +37,10 @@ def main():
         app.update_counts(devices)
         app.set_scanning(False)
 
-    def _on_subnet_change(value: str):
-        config.subnet = value
+    def _on_settings_change(subnet: str, interval: int):
+        config.subnet = subnet
+        config.scan_interval = interval
+        scanner.interval = interval
         scanner.force_scan()
 
     scanner = ScannerController(
