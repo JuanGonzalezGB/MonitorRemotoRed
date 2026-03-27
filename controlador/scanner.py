@@ -13,11 +13,11 @@ from modelo.device import Device
 
 
 def _script_path() -> str:
+    # usa sys._MEIPASS si está en PyInstaller
     if getattr(sys, "frozen", False):
         base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
     else:
-        base = os.path.dirname(os.path.abspath(__file__))
-
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base, "scan_network.sh")
 
 
