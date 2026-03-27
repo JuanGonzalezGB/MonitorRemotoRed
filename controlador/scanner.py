@@ -14,9 +14,10 @@ from modelo.device import Device
 
 def _script_path() -> str:
     if getattr(sys, "frozen", False):
-        base = os.path.dirname(sys.executable)
+        base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
     else:
-        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        base = os.path.dirname(os.path.abspath(__file__))
+
     return os.path.join(base, "scan_network.sh")
 
 
