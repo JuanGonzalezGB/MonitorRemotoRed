@@ -1,10 +1,13 @@
-#Monitor Red(WINDOWS)
+#Monitor Red(LINUX/WINDOWS)
+-----------------------------
 
-Debe tener nmap
+#Instalar requisitos LINUX:
+
+     pip3 install -r reqlinux.txt
 
 -----------------------------
 
-#Instalar requisitos:
+#Instalar requisitos WINDOWS:
 
 descargue nmap: https://nmap.org/ o:
 
@@ -12,10 +15,16 @@ descargue nmap: https://nmap.org/ o:
 
 luego:
 
-     pip3 install -r requirements.txt
+     pip3 install -r reqwin.txt
 
 -----------------------------
 
-Para instalar con pyinstaller desde windows:
+Para instalar desde Raspberry/Linux
+
+    pyinstaller --onedir --add-data "scan_network.sh:." --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --name="Net Monitor Beta" main.py
+
+Para instalar con pyinstaller desde Windows:
     
     pyinstaller --onedir --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --hidden-import nmap --name="Net Monitor Beta" main.py
+
+
