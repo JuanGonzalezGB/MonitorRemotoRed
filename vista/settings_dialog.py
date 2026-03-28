@@ -42,7 +42,7 @@ class SettingsDialog(tk.Toplevel):
         self.on_save = on_save
         self.overrideredirect(True)
         self.configure(bg=BG)
-        self.geometry(f"480x265+{parent.winfo_x()}+{parent.winfo_y()}")
+        self.geometry(f"480x260+{parent.winfo_x()}+{parent.winfo_y()}")
         self._kb_frame: tk.Frame | None = None
         self._build(current_subnet, current_interval, current_mongo)
         self.grab_set()
