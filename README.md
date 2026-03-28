@@ -9,6 +9,8 @@ Instalar requisitos:
      
      pip3 install -r requirements.txt
 
+Esto instala pymongo, si decide no usar mongodb, el programa guardará los dispositivos en devices.json
+
 -----------------------------
 En esta version se aplico patron mvc para facilitar futuros cambios.
 
