@@ -2,8 +2,8 @@ param(
     [string]$Subnet = "192.168.1.0/24"
 )
 
-Write-Host "[ps1] Starting scan..."
-Write-Host "[ps1] Subnet: $Subnet"
+Write-Error "[ps1] Starting scan..."
+Write-Error "[ps1] Subnet: $Subnet"
 
 $results = @()
 
@@ -12,20 +12,20 @@ $base = ($Subnet -split "/")[0]
 $parts = $base -split "\."
 $network = "$($parts[0]).$($parts[1]).$($parts[2])"
 
-Write-Host "[ps1] Network base: $network"
+Write-Error "[ps1] Network base: $network"
 
 # Limitar rango para debug (IMPORTANTE)
 $range = 1..50
 
 foreach ($i in $range) {
     $ip = "$network.$i"
-    Write-Host "[ps1] Scanning $ip"
+    Write-Error "[ps1] Scanning $ip"
 
     try {
         $ping = Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue -TimeoutSeconds 1
 
         if ($ping) {
-            Write-Host "[ps1] Alive: $ip"
+            Write-Error "[ps1] Alive: $ip"
 
             $latency = (Test-Connection -ComputerName $ip -Count 1).ResponseTime
 
@@ -47,11 +47,11 @@ foreach ($i in $range) {
         }
     }
     catch {
-        Write-Host "[ps1] Error scanning $ip"
+        Write-Error "[ps1] Error scanning $ip"
     }
 }
 
-Write-Host "[ps1] Scan finished. Devices:" $results.Count
+Write-Error "[ps1] Scan finished. Devices:" $results.Count
 
 # OUTPUT FINAL SOLO JSON
 $results | ConvertTo-Json -Compress
