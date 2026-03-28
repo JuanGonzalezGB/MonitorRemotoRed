@@ -7,6 +7,7 @@ __pycache__/
 /etc/sudoers.d/net_monitor
 
 config.json
+devices.json
 
 .vscode/
 *.swp

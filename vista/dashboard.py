@@ -37,7 +37,7 @@ COL_PING   =  6
 class Dashboard(tk.Tk):
     def __init__(self, config: Config, bw: BandwidthMonitor,
                  on_force_scan: Callable,
-                 on_settings_change: Callable[[str, int], None],
+                 on_settings_change: Callable[[str, int, dict], None],
                  on_rename: Callable[[str, str], None]):
         super().__init__()
         self.config = config
@@ -217,13 +217,14 @@ class Dashboard(tk.Tk):
             self,
             current_subnet=self.config.subnet,
             current_interval=self.config.scan_interval,
+            current_mongo=self.config.mongo,
             on_save=self._handle_settings_save
         )
 
-    def _handle_settings_save(self, subnet: str, interval: int):
+    def _handle_settings_save(self, subnet: str, interval: int, mongo: dict):
         self.lbl_subnet.config(text=subnet)
         self.clear_devices()
-        self.on_settings_change(subnet, interval)
+        self.on_settings_change(subnet, interval, mongo)
 
     def _tick_clock(self):
         self.lbl_time.config(text=datetime.now().strftime("%H:%M:%S"))

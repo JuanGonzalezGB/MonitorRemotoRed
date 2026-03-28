@@ -23,12 +23,12 @@ def main():
         config=config,
         bw=bw,
         on_force_scan=lambda: scanner.force_scan(),
-        on_settings_change=lambda s, i: _on_settings_change(s, i),
+        on_settings_change=lambda s, i, m: _on_settings_change(s, i, m),
         on_rename=lambda mac, name: config.set_device_name(mac, name),
     )
 
     def _on_scan_result(devices):
-        cache.update(devices)
+        cache.update(devices, config)
         app.after(0, lambda d=devices: _refresh(d))
 
     def _refresh(devices):
@@ -37,9 +37,10 @@ def main():
         app.update_counts(devices)
         app.set_scanning(False)
 
-    def _on_settings_change(subnet: str, interval: int):
+    def _on_settings_change(subnet: str, interval: int, mongo: dict):
         config.subnet = subnet
         config.scan_interval = interval
+        config.mongo = mongo
         scanner.interval = interval
         scanner.force_scan()
 

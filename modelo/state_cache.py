@@ -13,9 +13,11 @@ class StateCache:
         self._last_seen: dict[str, datetime] = {}
         self._current: dict[str, Device] = {}
 
-    def update(self, devices: list[Device]):
+    def update(self, devices: list[Device], config=None):
         now = datetime.now()
         for d in devices:
+            if config and d.mac not in self._current:
+                config.register_device(d.mac)
             self._current[d.mac] = d
             self._last_seen[d.mac] = now
             hist = self._ping_hist.setdefault(d.mac, [])

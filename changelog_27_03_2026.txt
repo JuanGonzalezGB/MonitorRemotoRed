@@ -1,0 +1,100 @@
+========================================
+CHANGELOG — 27/03/2026
+NetMonitor — Raspberry Pi Network Dashboard
+========================================
+
+----------------------------------------
+1. Refactor MVC
+----------------------------------------
+Se reestructuró el proyecto de un monolito (todos los archivos en la raíz)
+a una arquitectura MVC limpia:
+
+  model/
+    device.py       — dataclass Device
+    config.py       — carga/guarda config + dispositivos
+    state_cache.py  — historial de estados por MAC
+    bandwidth.py    — velocidad del host via /proc/net/dev
+
+  controller/
+    scanner.py      — ejecuta scan_network.sh, loop periódico
+    network.py      — preflight, sudoers, IP local
+
+  view/
+    dashboard.py    — ventana principal
+    dialogs.py      — RenameDialog, NumpadDialog
+    keyboards.py    — VirtualKeyboard y Numpad (reutilizables)
+    speed_panel.py  — panel de velocidad del host
+    settings_dialog.py — configuración general
+
+  main.py           — punto de entrada, conecta las tres capas
+
+----------------------------------------
+2. Teclados extraídos a view/keyboards.py
+----------------------------------------
+VirtualKeyboard y Numpad son ahora widgets tk.Frame independientes.
+Los diálogos los instancian y los empaquetan.
+Permite reusar los teclados en cualquier otro diálogo futuro.
+
+----------------------------------------
+3. MongoDB como fuente de dispositivos
+----------------------------------------
+- Dispositivos guardados en MongoDB (db: scanner, colección: dispositivos)
+- Si Mongo no está disponible al arrancar → usa devices.json como fallback
+- Si Mongo vuelve en el próximo arranque → migra devices.json a Mongo
+  automáticamente y lo elimina
+- La decisión (Mongo vs JSON) se toma una sola vez al arrancar,
+  no reintenta durante la sesión para evitar lentitud
+- Credenciales en config.json (no va al repo)
+
+----------------------------------------
+4. Registro automático de dispositivos nuevos
+----------------------------------------
+- Todo dispositivo que aparece en el scanner se registra automáticamente
+  con su MAC como nombre si no existe en la base de datos
+- Cambiar el nombre usa upsert → nunca duplica la entrada
+
+----------------------------------------
+5. Configuración desde la interfaz (⚙)
+----------------------------------------
+El botón ⚙ abre un diálogo con scroll que permite configurar:
+
+  Red:
+    - Subred (ej: 192.168.0.0/24)
+    - Intervalo de refresco en segundos
+
+  MongoDB:
+    - Host
+    - Puerto
+    - Usuario
+    - Contraseña (enmascarada con ●)
+    - Base de datos
+
+  El teclado cambia automáticamente según el campo con foco:
+    - Numpad para subred, intervalo, host y puerto
+    - QWERTY para usuario, contraseña y base de datos
+
+  Al guardar:
+    - config.json se actualiza
+    - El scanner adopta el nuevo intervalo inmediatamente
+    - La conexión a Mongo se reintenta con las nuevas credenciales
+
+----------------------------------------
+6. Cambios en defaults
+----------------------------------------
+  scan_interval: 2 segundos (antes 30)
+
+----------------------------------------
+7. Archivos migrados / eliminados
+----------------------------------------
+  Eliminados del repo:
+    gui.py, parser.py, state_cache.py, bandwidth.py (raíz)
+
+  Agregados:
+    migrate_devices.py  — migración única de config.json a MongoDB
+    view/keyboards.py
+    view/settings_dialog.py
+    model/device.py
+    controller/scanner.py
+    controller/network.py
+
+========================================
