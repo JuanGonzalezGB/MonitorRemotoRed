@@ -19,7 +19,7 @@ luego:
 
 -----------------------------
 
-Para instalar desde Raspberry/Linux
+Para instalar con pyinstaller desde Raspberry/Linux
 
     pyinstaller --onedir --add-data "scan_network.sh:." --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --name="Net Monitor Beta" main.py
 
