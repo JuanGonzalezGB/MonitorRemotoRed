@@ -7,31 +7,55 @@ import os
 import sys
 import threading
 import time
+import platform
 from typing import Callable
 
 from modelo.device import Device
 
 
 def _script_path() -> str:
-    # usa sys._MEIPASS si está en PyInstaller
+    # Soporte PyInstaller
     if getattr(sys, "frozen", False):
         base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
     else:
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base, "scan_network.sh")
+
+    # Elegir script según OS
+    if platform.system() == "Windows":
+        return os.path.join(base, "scan_network.ps1")
+    else:
+        return os.path.join(base, "scan_network.sh")
 
 
 def run_scan(subnet: str) -> list[Device]:
     script = _script_path()
+
     try:
+        # Elegir comando según OS
+        if platform.system() == "Windows":
+            cmd = [
+                "powershell",
+                "-ExecutionPolicy", "Bypass",
+                "-File", script,
+                subnet
+            ]
+        else:
+            cmd = ["bash", script, subnet]
+
         result = subprocess.run(
-            ["bash", script, subnet],
-            capture_output=True, text=True, timeout=45
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=45
         )
+
         raw = result.stdout.strip()
+
         if not raw:
             return []
+
         data = json.loads(raw)
+
         return [
             Device(
                 ip=d["ip"],
@@ -41,12 +65,16 @@ def run_scan(subnet: str) -> list[Device]:
             )
             for d in data if "ip" in d and "mac" in d
         ]
+
     except subprocess.TimeoutExpired:
         print("[scanner] Timeout")
         return []
+
     except json.JSONDecodeError as e:
         print(f"[scanner] JSON error: {e}")
+        print(f"[scanner] RAW OUTPUT: {raw}")
         return []
+
     except Exception as e:
         print(f"[scanner] Error: {e}")
         return []
@@ -87,7 +115,9 @@ class ScannerController:
     def _do_scan(self):
         if self._scanning:
             return
+
         self._scanning = True
+
         try:
             devices = run_scan(self._get_subnet())
             self._on_result(devices)
