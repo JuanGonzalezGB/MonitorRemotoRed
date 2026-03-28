@@ -7,9 +7,11 @@ Debe tener nmap
 
 Instalar requisitos:
 
-     pip install python-nmap psutil
+     descargue nmap: https://nmap.org/
 
-Requisitos opcionales:
+     #o
+
+     winget install nmap
 
      pip3 install -r requirements.txt
 
