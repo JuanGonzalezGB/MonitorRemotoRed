@@ -24,4 +24,4 @@ Para instalar con pyinstaller desde windows:
 
     pip3 install pymongo 
     
-    pyinstaller --onedir --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --hidden-import nmap main.py
+    pyinstaller --onedir --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --hidden-import nmap --name="Net Monitor Beta" main.py
