@@ -1,5 +1,7 @@
 """
-controller/network.py — lógica de red: detectar host local, setup sudoers
+controller/network.py — preflight multiplataforma
+- Linux: verifica arp-scan, configura sudoers
+- Windows: verifica nmap
 """
 import os
 import sys
@@ -19,7 +21,9 @@ def get_local_ip() -> str:
         return ""
 
 
-def find_arp_scan() -> str | None:
+# ── Linux ─────────────────────────────────────────────────────────────────────
+
+def _find_arp_scan() -> str | None:
     path = shutil.which("arp-scan")
     if path:
         return path
@@ -29,7 +33,7 @@ def find_arp_scan() -> str | None:
     return None
 
 
-def sudo_configured(arp_path: str) -> bool:
+def _sudo_configured(arp_path: str) -> bool:
     result = subprocess.run(
         ["sudo", "-n", arp_path, "--help"],
         capture_output=True
@@ -37,7 +41,7 @@ def sudo_configured(arp_path: str) -> bool:
     return result.returncode == 0
 
 
-def setup_sudoers(arp_path: str) -> bool:
+def _setup_sudoers(arp_path: str) -> bool:
     user = os.environ.get("SUDO_USER") or os.environ.get("USER") or os.getlogin()
     rule = f"{user} ALL=(ALL) NOPASSWD: {arp_path}\n"
     sudoers_file = "/etc/sudoers.d/net_monitor"
@@ -55,7 +59,6 @@ def setup_sudoers(arp_path: str) -> bool:
         return False
 
     subprocess.run(["sudo", "chmod", "440", sudoers_file], check=True)
-
     verify = subprocess.run(
         ["sudo", "visudo", "-c", "-f", sudoers_file],
         capture_output=True
@@ -68,18 +71,42 @@ def setup_sudoers(arp_path: str) -> bool:
     return True
 
 
-def preflight() -> bool:
-    """Verifica dependencias y configura sudoers si hace falta. Retorna True si OK."""
-    arp_path = find_arp_scan()
+def _preflight_linux() -> bool:
+    arp_path = _find_arp_scan()
     if not arp_path:
         print("ERROR: arp-scan no está instalado.")
         print("  Instalalo con: sudo apt install arp-scan")
         return False
-
-    if not sudo_configured(arp_path):
-        ok = setup_sudoers(arp_path)
-        if not ok or not sudo_configured(arp_path):
+    if not _sudo_configured(arp_path):
+        ok = _setup_sudoers(arp_path)
+        if not ok or not _sudo_configured(arp_path):
             print("ERROR: no se pudo configurar sudo.")
             return False
+    return True
+
+
+# ── Windows ───────────────────────────────────────────────────────────────────
+
+def _preflight_windows() -> bool:
+    try:
+        import nmap
+    except ImportError:
+        print("ERROR: python-nmap no instalado.")
+        print("  Instalalo con: pip install python-nmap")
+        return False
+
+    nmap_path = shutil.which("nmap")
+    if not nmap_path:
+        print("ERROR: nmap no encontrado en el PATH.")
+        print("  Descargalo en: https://nmap.org/download.html")
+        return False
 
     return True
+
+
+# ── Pública ───────────────────────────────────────────────────────────────────
+
+def preflight() -> bool:
+    if sys.platform == "win32":
+        return _preflight_windows()
+    return _preflight_linux()

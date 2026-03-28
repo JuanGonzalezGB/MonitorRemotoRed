@@ -1,11 +1,14 @@
 """
-model/bandwidth.py — velocidad del host via /proc/net/dev (sin sudo)
+model/bandwidth.py — velocidad del host, multiplataforma
+- Linux: /proc/net/dev (sin dependencias)
+- Windows: psutil
 """
+import sys
 import time
 import threading
 
 
-def _get_default_iface() -> str:
+def _get_default_iface_linux() -> str:
     try:
         with open("/proc/net/route") as f:
             for line in f:
@@ -17,7 +20,7 @@ def _get_default_iface() -> str:
     return "eth0"
 
 
-def _read_iface(iface: str) -> tuple[int, int] | None:
+def _read_iface_linux(iface: str) -> tuple[int, int] | None:
     try:
         with open("/proc/net/dev") as f:
             for line in f:
@@ -32,11 +35,26 @@ def _read_iface(iface: str) -> tuple[int, int] | None:
     return None
 
 
+def _read_stats_windows() -> tuple[int, int] | None:
+    try:
+        import psutil
+        counters = psutil.net_io_counters()
+        return counters.bytes_recv, counters.bytes_sent
+    except Exception:
+        return None
+
+
+def _read_stats() -> tuple[int, int] | None:
+    if sys.platform == "win32":
+        return _read_stats_windows()
+    iface = _get_default_iface_linux()
+    return _read_iface_linux(iface)
+
+
 class BandwidthMonitor:
     HISTORY = 30
 
     def __init__(self):
-        self._iface = _get_default_iface()
         self._lock = threading.Lock()
         self._rx_hist: list[float] = []
         self._tx_hist: list[float] = []
@@ -53,7 +71,7 @@ class BandwidthMonitor:
 
     def _loop(self):
         while self._running:
-            stats = _read_iface(self._iface)
+            stats = _read_stats()
             now = time.time()
             if stats and self._prev and self._prev_time:
                 dt = now - self._prev_time

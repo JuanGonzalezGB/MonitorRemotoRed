@@ -1,97 +1,41 @@
 """
-controller/scanner.py — ejecuta el scan y notifica a la vista via callback
-(DEBUG VERSION)
+controller/scanner.py — escaneo de red multiplataforma
+- Linux: scan_network.sh (arp-scan + ping)
+- Windows: python-nmap
 """
-import subprocess
-import json
 import os
 import sys
 import threading
 import time
-import platform
 from typing import Callable
 
-from modelo.device import Device
+from model.device import Device
 
+
+# ── Backend Linux ─────────────────────────────────────────────────────────────
 
 def _script_path() -> str:
-    # Soporte PyInstaller
     if getattr(sys, "frozen", False):
         base = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
-        print(f"[scanner] Running in PyInstaller bundle")
     else:
         base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        print(f"[scanner] Running in dev mode")
-
-    print(f"[scanner] Base path: {base}")
-
-    # Elegir script según OS
-    if platform.system() == "Windows":
-        path = os.path.join(base, "scan_network.ps1")
-    else:
-        path = os.path.join(base, "scan_network.sh")
-
-    print(f"[scanner] Script path: {path}")
-    print(f"[scanner] Script exists: {os.path.exists(path)}")
-
-    return path
+    return os.path.join(base, "scan_network.sh")
 
 
-def run_scan(subnet: str) -> list[Device]:
-    print(f"\n[scanner] ===== RUN SCAN =====")
-    print(f"[scanner] Subnet: {subnet}")
-    print(f"[scanner] OS: {platform.system()}")
-
+def _scan_linux(subnet: str) -> list[Device]:
+    import subprocess
+    import json
     script = _script_path()
-
     try:
-        # Elegir comando según OS
-        if platform.system() == "Windows":
-            cmd = [
-                "powershell",
-                "-ExecutionPolicy", "Bypass",
-                "-NoProfile",
-                "-File", script,
-                subnet
-            ]
-        else:
-            cmd = ["bash", script, subnet]
-
-        print(f"[scanner] Command: {' '.join(cmd)}")
-
-        start_time = time.time()
-
         result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=45
+            ["bash", script, subnet],
+            capture_output=True, text=True, timeout=45
         )
-
-        duration = time.time() - start_time
-
-        print(f"[scanner] Return code: {result.returncode}")
-        print(f"[scanner] Duration: {duration:.2f}s")
-
-        print(f"\n[scanner] STDOUT:\n{result.stdout}")
-        print(f"\n[scanner] STDERR:\n{result.stderr}")
-
         raw = result.stdout.strip()
-
-        print(f"[scanner] RAW length: {len(raw)}")
-
         if not raw:
-            print("[scanner] ❌ Empty output")
             return []
-
-        try:
-            data = json.loads(raw)
-        except Exception as e:
-            print(f"[scanner] ❌ JSON parse failed")
-            print(f"[scanner] RAW OUTPUT:\n{raw}")
-            raise e
-
-        devices = [
+        data = json.loads(raw)
+        return [
             Device(
                 ip=d["ip"],
                 mac=d["mac"],
@@ -100,24 +44,107 @@ def run_scan(subnet: str) -> list[Device]:
             )
             for d in data if "ip" in d and "mac" in d
         ]
+    except Exception as e:
+        print(f"[scanner] Error Linux: {e}")
+        return []
 
-        print(f"[scanner] ✅ Devices found: {len(devices)}")
+
+# ── Backend Windows ───────────────────────────────────────────────────────────
+
+def _scan_windows(subnet: str) -> list[Device]:
+    try:
+        import nmap
+        import socket
+    except ImportError:
+        print("[scanner] python-nmap no instalado. Corré: pip install python-nmap")
+        return []
+
+    try:
+        nm = nmap.PortScanner()
+        # -sn: ping scan (no ports), -PR: ARP ping, --host-timeout limita tiempo por host
+        nm.scan(hosts=subnet, arguments="-sn -PR --host-timeout 2s")
+
+        devices = []
+        for host in nm.all_hosts():
+            try:
+                info = nm[host]
+                state = info.state()
+                if state != "up":
+                    continue
+
+                mac = ""
+                vendor = ""
+                if "addresses" in info:
+                    mac = info["addresses"].get("mac", "").lower()
+                if "vendor" in info and mac:
+                    vendor = list(info["vendor"].values())[0] if info["vendor"] else ""
+
+                # Ping para obtener latencia
+                ping_ms = _ping_windows(host)
+
+                if not mac:
+                    # Intentar obtener MAC via ARP cache
+                    mac = _arp_cache_windows(host)
+
+                if mac:
+                    devices.append(Device(
+                        ip=host,
+                        mac=mac,
+                        vendor=vendor,
+                        ping_ms=ping_ms
+                    ))
+            except Exception as e:
+                print(f"[scanner] Error procesando {host}: {e}")
 
         return devices
-
-    except subprocess.TimeoutExpired:
-        print("[scanner] ❌ TIMEOUT (script took too long)")
-        return []
-
-    except json.JSONDecodeError as e:
-        print(f"[scanner] ❌ JSON error: {e}")
-        print(f"[scanner] RAW OUTPUT:\n{raw}")
-        return []
-
     except Exception as e:
-        print(f"[scanner] ❌ Error: {e}")
+        print(f"[scanner] Error nmap: {e}")
         return []
 
+
+def _ping_windows(ip: str) -> float | None:
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["ping", "-n", "1", "-w", "1000", ip],
+            capture_output=True, text=True, timeout=3
+        )
+        for line in result.stdout.split("\n"):
+            if "tiempo" in line.lower() or "time" in line.lower():
+                import re
+                m = re.search(r"[=<](\d+)ms", line)
+                if m:
+                    return float(m.group(1))
+    except Exception:
+        pass
+    return None
+
+
+def _arp_cache_windows(ip: str) -> str:
+    import subprocess
+    import re
+    try:
+        result = subprocess.run(
+            ["arp", "-a", ip],
+            capture_output=True, text=True, timeout=3
+        )
+        m = re.search(r"([0-9a-f]{2}[:-]){5}[0-9a-f]{2}", result.stdout, re.IGNORECASE)
+        if m:
+            return m.group(0).replace("-", ":").lower()
+    except Exception:
+        pass
+    return ""
+
+
+# ── Función pública de scan ───────────────────────────────────────────────────
+
+def run_scan(subnet: str) -> list[Device]:
+    if sys.platform == "win32":
+        return _scan_windows(subnet)
+    return _scan_linux(subnet)
+
+
+# ── Controlador ───────────────────────────────────────────────────────────────
 
 class ScannerController:
     def __init__(self, get_subnet: Callable[[], str],
@@ -130,16 +157,13 @@ class ScannerController:
         self._running = False
 
     def start(self):
-        print("[scanner] Controller started")
         self._running = True
         threading.Thread(target=self._loop, daemon=True).start()
 
     def stop(self):
-        print("[scanner] Controller stopped")
         self._running = False
 
     def force_scan(self):
-        print("[scanner] Force scan triggered")
         threading.Thread(target=self._do_scan, daemon=True).start()
 
     @property
@@ -152,28 +176,19 @@ class ScannerController:
 
     @interval.setter
     def interval(self, value: int):
-        print(f"[scanner] Interval set to: {value}")
         self._interval = max(1, value)
 
     def _do_scan(self):
         if self._scanning:
-            print("[scanner] Scan already running, skipping...")
             return
-
-        print("[scanner] Starting scan...")
         self._scanning = True
-
         try:
             devices = run_scan(self._get_subnet())
-            print(f"[scanner] Sending {len(devices)} devices to callback")
             self._on_result(devices)
         finally:
             self._scanning = False
-            print("[scanner] Scan finished")
 
     def _loop(self):
-        print("[scanner] Entering loop")
         while self._running:
             self._do_scan()
-            print(f"[scanner] Sleeping {self._interval}s...\n")
             time.sleep(self._interval)
