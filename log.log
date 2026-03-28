@@ -1,58 +1,513 @@
-[ps1] Error scanning 192.168.0.23
-[ps1] Scanning 192.168.0.24
-[ps1] Error scanning 192.168.0.24
-[ps1] Scanning 192.168.0.25
-[ps1] Error scanning 192.168.0.25
-[ps1] Scanning 192.168.0.26
-[ps1] Error scanning 192.168.0.26
-[ps1] Scanning 192.168.0.27
-[ps1] Error scanning 192.168.0.27
-[ps1] Scanning 192.168.0.28
-[ps1] Error scanning 192.168.0.28
-[ps1] Scanning 192.168.0.29
-[ps1] Error scanning 192.168.0.29
-[ps1] Scanning 192.168.0.30
-[ps1] Error scanning 192.168.0.30
-[ps1] Scanning 192.168.0.31
-[ps1] Error scanning 192.168.0.31
-[ps1] Scanning 192.168.0.32
-[ps1] Error scanning 192.168.0.32
-[ps1] Scanning 192.168.0.33
-[ps1] Error scanning 192.168.0.33
-[ps1] Scanning 192.168.0.34
-[ps1] Error scanning 192.168.0.34
-[ps1] Scanning 192.168.0.35
-[ps1] Error scanning 192.168.0.35
-[ps1] Scanning 192.168.0.36
-[ps1] Error scanning 192.168.0.36
-[ps1] Scanning 192.168.0.37
-[ps1] Error scanning 192.168.0.37
-[ps1] Scanning 192.168.0.38
-[ps1] Error scanning 192.168.0.38
-[ps1] Scanning 192.168.0.39
-[ps1] Error scanning 192.168.0.39
-[ps1] Scanning 192.168.0.40
-[ps1] Error scanning 192.168.0.40
-[ps1] Scanning 192.168.0.41
-[ps1] Error scanning 192.168.0.41
-[ps1] Scanning 192.168.0.42
-[ps1] Error scanning 192.168.0.42
-[ps1] Scanning 192.168.0.43
-[ps1] Error scanning 192.168.0.43
-[ps1] Scanning 192.168.0.44
-[ps1] Error scanning 192.168.0.44
-[ps1] Scanning 192.168.0.45
-[ps1] Error scanning 192.168.0.45
-[ps1] Scanning 192.168.0.46
-[ps1] Error scanning 192.168.0.46
-[ps1] Scanning 192.168.0.47
-[ps1] Error scanning 192.168.0.47
-[ps1] Scanning 192.168.0.48
-[ps1] Error scanning 192.168.0.48
-[ps1] Scanning 192.168.0.49
-[ps1] Error scanning 192.168.0.49
-[ps1] Scanning 192.168.0.50
-[ps1] Error scanning 192.168.0.50
-[ps1] Scan finished. Devices: 0
-[scanner] ❌ JSON error: Expecting value: line 1 column 2 (cha
-r 1)
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.15
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.16
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.16
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.17
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.17
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.18
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.18
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.19
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.19
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.20
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.20
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.21
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.21
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.22
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.22
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.23
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.23
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.24
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.24
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.25
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.25
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro 
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.26
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.26
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.27
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.27
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.28
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.28
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.29
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.29
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.30
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.30
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.31
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.31
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.32
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.32
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.33
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.33
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.34
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.34
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.35
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.35
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.36
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.36
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.37
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.37
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.38
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.38
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.39
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.39
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.40
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.40
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.41
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.41
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.42
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.42
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.43
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.43
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.44
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.44
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.45
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.45
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.46
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.46
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.47
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.47
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.48
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.48
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.49
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.49
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Scanning 192.168.0.50
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_networ 
+k.ps1 : [ps1] Error scanning 192.168.0.50
+    + CategoryInfo          : NotSpecified: (:) [Write-Erro  
+   r], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands  
+   .WriteErrorException,scan_network.ps1
+
+Write-Error : A positional parameter cannot be found that    
+accepts argument '0'.
+At C:\Users\GurthBrannon\Documents\MonitorRemotoRed\scan_net 
+work.ps1:54 char:1
++ Write-Error "[ps1] Scan finished. Devices:" $results.Count 
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    + CategoryInfo          : InvalidArgument: (:) [Write-E  
+   rror], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,M  
+   icrosoft.PowerShell.Commands.WriteErrorCommand
+
+
+[scanner] RAW length: 0
+[scanner] ❌ Empty output
+[scanner] Sending 0 devices to callback
+[scanner] Scan finished
