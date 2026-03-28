@@ -11,8 +11,8 @@ from vista.dashboard import Dashboard
 
 
 def main():
-    #if not preflight():
-     #   sys.exit(1)
+    if not preflight():
+        sys.exit(1)
 
     config = Config()
     cache  = StateCache()

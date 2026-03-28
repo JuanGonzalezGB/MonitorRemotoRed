@@ -9,7 +9,7 @@ import threading
 import time
 from typing import Callable
 
-from model.device import Device
+from modelo.device import Device
 
 
 # ── Backend Linux ─────────────────────────────────────────────────────────────
