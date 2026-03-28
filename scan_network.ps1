@@ -2,8 +2,14 @@ param(
     [string]$Subnet = "192.168.1.0/24"
 )
 
-Write-Error "[ps1] Starting scan..."
-Write-Error "[ps1] Subnet: $Subnet"
+# Función para log (stderr sin romper ejecución)
+function Log {
+    param($msg)
+    [Console]::Error.WriteLine($msg)
+}
+
+Log "[ps1] Starting scan..."
+Log "[ps1] Subnet: $Subnet"
 
 $results = @()
 
@@ -12,29 +18,32 @@ $base = ($Subnet -split "/")[0]
 $parts = $base -split "\."
 $network = "$($parts[0]).$($parts[1]).$($parts[2])"
 
-Write-Error "[ps1] Network base: $network"
+Log "[ps1] Network base: $network"
 
-# Limitar rango para debug (IMPORTANTE)
+# Rango limitado (debug)
 $range = 1..50
 
 foreach ($i in $range) {
     $ip = "$network.$i"
-    Write-Error "[ps1] Scanning $ip"
+    Log "[ps1] Scanning $ip"
 
     try {
         $ping = Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue -TimeoutSeconds 1
 
-        if ($ping) {
-            Write-Error "[ps1] Alive: $ip"
+        if ($ping -eq $true) {
+            Log "[ps1] Alive: $ip"
 
-            $latency = (Test-Connection -ComputerName $ip -Count 1).ResponseTime
+            $latency = (Test-Connection -ComputerName $ip -Count 1 -ErrorAction SilentlyContinue).ResponseTime
 
             $mac = "unknown"
             $arp = arp -a | Select-String $ip
 
             if ($arp) {
-                $mac = ($arp -split "\s+") | Where-Object {
+                $mac_match = ($arp -split "\s+") | Where-Object {
                     $_ -match "([0-9a-f]{2}-){5}[0-9a-f]{2}"
+                }
+                if ($mac_match) {
+                    $mac = $mac_match
                 }
             }
 
@@ -47,11 +56,11 @@ foreach ($i in $range) {
         }
     }
     catch {
-        Write-Error "[ps1] Error scanning $ip"
+        Log "[ps1] FAIL $ip"
     }
 }
 
-Write-Error "[ps1] Scan finished. Devices:" $results.Count
+Log "[ps1] Scan finished. Devices: $($results.Count)"
 
-# OUTPUT FINAL SOLO JSON
+# 🔥 SOLO JSON en stdout
 $results | ConvertTo-Json -Compress
