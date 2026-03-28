@@ -20,7 +20,7 @@ En esta version se aplico patron mvc para facilitar futuros cambios.
 
 -----------------------------
 
-Para instalar con pyinstaller desde raspberry:
+Para instalar con pyinstaller desde windows:
 
     pip3 install pymongo 
     
