@@ -7,9 +7,7 @@ Debe tener nmap
 
 Instalar requisitos:
 
-     descargue nmap: https://nmap.org/
-
-     #o
+descargue nmap: https://nmap.org/ o:
 
      winget install nmap
 
