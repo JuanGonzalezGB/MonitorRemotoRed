@@ -1,22 +1,18 @@
 #Monitor Red(WINDOWS)
 
-
 Debe tener nmap
 
 -----------------------------
 
-Instalar requisitos:
+#Instalar requisitos:
 
 descargue nmap: https://nmap.org/ o:
 
      winget install nmap
 
+luego:
+
      pip3 install -r requirements.txt
-
-Esto instala pymongo, si decide no usar mongodb, el programa guardará los dispositivos en devices.json
-
------------------------------
-En esta version se aplico patron mvc para facilitar futuros cambios.
 
 -----------------------------
 
