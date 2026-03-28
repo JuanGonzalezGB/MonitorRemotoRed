@@ -13,7 +13,7 @@ DEFAULT = {
     "scan_interval": 2,
     "ping_warn_ms": 20,
     "mongodb": {
-        "host": "192.168.0.108",
+        "host": "localhost",
         "port": 27017,
         "user": "",
         "password": "",
