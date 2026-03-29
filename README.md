@@ -20,6 +20,7 @@ luego:
 -----------------------------
 
 #uso de mongodb es opcional. 
+
 El programa está pensado para usar una base de datos mongodb para almacenar los dispositivos que se conecten a la red, sin embargo, de no haber una base de datos mongodb corriendo en localhost o en la red local, el programa guardará los dispositivos en 'devices.json', si luego decide instalar mongodb y hacer uso de esta para el programa, el programa migrará la información del JSON a su base de datos y se eliminará del sistema.
 
 Puede configurar ip, credenciales y nombre de la base de datos que quiere usar desde el programa o editando 'settings.json'.
