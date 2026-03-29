@@ -15,15 +15,44 @@ class ControladorTemas:
 
         # --- fondo ---
         try:
-            current_bg = widget.cget("bg")
-
-            # conservar bg2 si ya lo era
-            if current_bg == self.root.master.estilo.bg2:
-                widget.configure(bg=estilo.colorBg2())
-            else:
-                widget.configure(bg=estilo.colorBg())
+            widget.configure(bg=estilo.colorBg())
         except:
             pass
+
+        # --- labels ---
+        if isinstance(widget, tk.Label):
+            widget.config(
+                bg=estilo.colorBg(),
+                fg=estilo.colorWhite()
+            )
+
+        # --- botones ---
+        elif isinstance(widget, tk.Button):
+            widget.config(
+                bg=estilo.colorBoton(),
+                fg=estilo.colorCyan(),
+                activebackground=estilo.colorBg2(),
+                activeforeground=estilo.colorWhite()
+            )
+
+        # --- option menu ---
+        elif isinstance(widget, tk.OptionMenu):
+            widget.config(
+                bg=estilo.colorBg2(),
+                fg=estilo.colorWhite(),
+                activebackground=estilo.colorBg2()
+            )
+
+        # Entry (te falta esto y es clave)
+        elif isinstance(widget, tk.Entry):
+            widget.config(
+                bg=estilo.colorBg2(),
+                fg=estilo.colorWhite(),
+                insertbackground=estilo.colorWhite
+            )
+
+        for child in widget.winfo_children():
+            self._aplicar_recursivo(child, estilo)
 
         # --- labels ---
         if isinstance(widget, tk.Label):
