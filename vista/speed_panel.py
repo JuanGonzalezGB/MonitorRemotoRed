@@ -18,6 +18,11 @@ GRAPH_W = 440
 GRAPH_H = 60
 
 
+def fmt_mbps(kbs: float) -> str:
+    mbps = kbs * 8 / 1024
+    return f"{mbps:.1f} Mbps"
+
+
 def fmt_kbs(kbs: float) -> str:
     if kbs >= 1024:
         return f"{kbs/1024:.1f} MB/s"
@@ -31,6 +36,8 @@ class SpeedPanel(tk.Toplevel):
         self.bw = bw
         self.ip = ip
         self._running = True
+        self._peak_rx = 0.0
+        self._peak_tx = 0.0
 
         self.overrideredirect(True)
         self.configure(bg=BG)
@@ -68,10 +75,23 @@ class SpeedPanel(tk.Toplevel):
 
         leg = tk.Frame(self, bg=BG)
         leg.pack(fill="x", padx=10, pady=(4, 6))
-        tk.Label(leg, text="— descarga", bg=BG, fg=GREEN,
-                 font=F_SMALL).pack(side="left")
-        tk.Label(leg, text="— subida", bg=BG, fg=CYAN,
-                 font=F_SMALL).pack(side="left", padx=12)
+        rx_col = tk.Frame(leg, bg=BG)
+        rx_col.pack(side="left")
+        self.lbl_rx_mbps = tk.Label(rx_col, text="— descarga  0.0 Mbps",
+                                     bg=BG, fg=GREEN, font=F_SMALL)
+        self.lbl_rx_mbps.pack(anchor="w")
+        self.lbl_rx_peak = tk.Label(rx_col, text="  peak  0.0 Mbps",
+                                     bg=BG, fg=MUTED, font=F_SMALL)
+        self.lbl_rx_peak.pack(anchor="w")
+
+        tx_col = tk.Frame(leg, bg=BG)
+        tx_col.pack(side="left", padx=12)
+        self.lbl_tx_mbps = tk.Label(tx_col, text="— subida  0.0 Mbps",
+                                     bg=BG, fg=CYAN, font=F_SMALL)
+        self.lbl_tx_mbps.pack(anchor="w")
+        self.lbl_tx_peak = tk.Label(tx_col, text="  peak  0.0 Mbps",
+                                     bg=BG, fg=MUTED, font=F_SMALL)
+        self.lbl_tx_peak.pack(anchor="w")
         tk.Button(leg, text="Cerrar", bg=BG2, fg=MUTED,
                   font=F_SMALL, relief="flat", bd=0, padx=8,
                   command=self._close).pack(side="right")
@@ -83,6 +103,12 @@ class SpeedPanel(tk.Toplevel):
         rx_hist, tx_hist = self.bw.history()
         self.lbl_rx.config(text=f"↓  {fmt_kbs(rx)}")
         self.lbl_tx.config(text=f"↑  {fmt_kbs(tx)}")
+        self._peak_rx = max(self._peak_rx, rx)
+        self._peak_tx = max(self._peak_tx, tx)
+        self.lbl_rx_mbps.config(text=f"— descarga  {fmt_mbps(rx)}")
+        self.lbl_tx_mbps.config(text=f"— subida  {fmt_mbps(tx)}")
+        self.lbl_rx_peak.config(text=f"  peak  {fmt_mbps(self._peak_rx)}")
+        self.lbl_tx_peak.config(text=f"  peak  {fmt_mbps(self._peak_tx)}")
         self._draw_graph(rx_hist, tx_hist)
         self.after(1000, self._update)
 

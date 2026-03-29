@@ -69,6 +69,10 @@ class Dashboard(tk.Tk):
                   font=("monospace", 11), relief="flat", bd=0,
                   activebackground=BG, activeforeground=CYAN, cursor="hand2",
                   command=self._open_settings).pack(side="left", padx=(6, 0))
+        tk.Button(hdr, text="↑↓", bg=BG, fg=MUTED,
+                  font=("monospace", 11), relief="flat", bd=0,
+                  activebackground=BG, activeforeground=CYAN, cursor="hand2",
+                  command=self._open_host_speed).pack(side="left", padx=(4, 0))
         self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_time.pack(side="right")
         self.lbl_counts = tk.Label(hdr, text="escaneando...",
@@ -211,6 +215,11 @@ class Dashboard(tk.Tk):
         ip = self.rows[mac]["ip"]
         label = self.config.device_name(mac) or ip.split(".")[-1]
         SpeedPanel(self, label, ip, mac, self.bw)
+
+    def _open_host_speed(self):
+        from vista.speed_panel import SpeedPanel
+        local_ip = self._local_ip or "este equipo"
+        SpeedPanel(self, "Host", local_ip, "", self.bw)
 
     def _open_settings(self):
         SettingsDialog(
