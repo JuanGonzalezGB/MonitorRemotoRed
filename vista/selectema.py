@@ -21,7 +21,7 @@ class ThemeSelector(tk.Toplevel):
         self.controladorTema = ControladorTemas(self)
 
         self.title("Themes")
-        self.geometry("480x280")
+        self.geometry("480x240")
         self.resizable(False, False)
         self.configure(bg=self.estilo.bg)
 
