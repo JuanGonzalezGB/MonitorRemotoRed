@@ -7,14 +7,6 @@ from typing import Callable
 from vista.gui_dictionary import COLORS, FORMATS
 
 
-BG      = COLORS["BG"]
-BG2     = COLORS["BG2"]
-BORDER  = COLORS["BORDER"]
-COLOR1  = COLORS["ORANGE"]
-COLOR2    = COLORS["CYAN"]
-COLOR3   = COLORS["WHITE"]
-MUTED   = COLORS["MUTED"]
-
 
 
 F_NORMAL = FORMATS["F_NORMAL"]
@@ -26,37 +18,38 @@ class VirtualKeyboard(tk.Frame):
     KEYS = [
         list("1234567890"),
         list("qwertyuiop"),
-        list("asdfghjkl"),
-        list("zxcvbnm-_"),
+        list("asdfghjklñ"),
+        list("zxcvbnm.-_"),
     ]
 
-    def __init__(self, parent, entry: tk.Entry, **kwargs):
-        super().__init__(parent, bg=BG, **kwargs)
+    def __init__(self, estilo, parent, entry: tk.Entry, **kwargs,):
+        super().__init__(parent, **kwargs)
+        self.estilo=estilo
         self._entry = entry
         self._uppercase = False
         self._build()
 
     def _build(self):
         for row in self.KEYS:
-            rf = tk.Frame(self, bg=BG)
+            rf = tk.Frame(self, bg=self.estilo.bg)
             rf.pack()
             for ch in row:
-                tk.Button(rf, text=ch, width=3, bg=BG2, fg=COLOR3,
+                tk.Button(rf, text=ch, width=3, bg=self.estilo.bg2, fg=self.estilo.white,
                           font=F_SMALL, relief="flat", bd=0,
-                          activebackground=BORDER, activeforeground=COLOR2,
+                          activebackground=self.estilo.border, activeforeground=self.estilo.cyan,
                           command=lambda c=ch: self._type(c)
                 ).pack(side="left", padx=1, pady=1)
 
-        sp = tk.Frame(self, bg=BG)
+        sp = tk.Frame(self, bg=self.estilo.bg)
         sp.pack(pady=(2, 0))
-        self._btn_case = tk.Button(sp, text="abc", width=4, bg=BG2, fg=MUTED,
+        self._btn_case = tk.Button(sp, text="abc", width=4, bg=self.estilo.bg2, fg=self.estilo.muted,
                                    font=F_SMALL, relief="flat", bd=0,
                                    command=self._toggle_case)
         self._btn_case.pack(side="left", padx=1)
-        tk.Button(sp, text="espacio", width=8, bg=BG2, fg=COLOR3,
+        tk.Button(sp, text="espacio", width=52, bg=self.estilo.bg2, fg=self.estilo.white,
                   font=F_SMALL, relief="flat", bd=0,
                   command=lambda: self._type(" ")).pack(side="left", padx=1)
-        tk.Button(sp, text="⌫", width=4, bg=BG2, fg=COLOR1,
+        tk.Button(sp, text="⌫", width=4, bg=self.estilo.bg2, fg=self.estilo.orange,
                   font=F_SMALL, relief="flat", bd=0,
                   command=self._backspace).pack(side="left", padx=1)
 
@@ -81,32 +74,33 @@ class VirtualKeyboard(tk.Frame):
 class Numpad(tk.Frame):
     """Teclado numérico para IPs y subredes."""
 
-    def __init__(self, parent, entry: tk.Entry, **kwargs):
-        super().__init__(parent, bg=BG, **kwargs)
+    def __init__(self, estilo, parent, entry: tk.Entry, **kwargs):
+        self.estilo=estilo
+        super().__init__(parent, bg=self.estilo.bg, **kwargs)
         self._entry = entry
         self._build()
 
     def _build(self):
-        rf1 = tk.Frame(self, bg=BG)
+        rf1 = tk.Frame(self, bg=self.estilo.bg)
         rf1.pack()
         for ch in "1234567890":
-            tk.Button(rf1, text=ch, width=3, bg=BG2, fg=COLOR3,
+            tk.Button(rf1, text=ch, width=3, bg=self.estilo.bg2, fg=self.estilo.white,
                       font=F_NORMAL, relief="flat", bd=0,
-                      activebackground=BORDER, activeforeground=COLOR2,
+                      activebackground=self.estilo.border, activeforeground=self.estilo.cyan,
                       command=lambda c=ch: self._type(c)
             ).pack(side="left", padx=1, pady=2)
 
-        rf2 = tk.Frame(self, bg=BG)
+        rf2 = tk.Frame(self, bg=self.estilo.bg)
         rf2.pack(pady=(2, 0))
         for ch, fg, w, cmd in [
-            (".", COLOR3, 4, lambda: self._type(".")),
-            ("/", COLOR3, 4, lambda: self._type("/")),
-            ("⌫", COLOR1, 4, self._backspace),
-            ("Limpiar", MUTED, 8, lambda: self._entry.delete(0, "end")),
+            (".", self.estilo.white, 4, lambda: self._type(".")),
+            ("/", self.estilo.white, 4, lambda: self._type("/")),
+            ("⌫", self.estilo.orange, 4, self._backspace),
+            ("Limpiar", self.estilo.muted, 8, lambda: self._entry.delete(0, "end")),
         ]:
-            tk.Button(rf2, text=ch, width=w, bg=BG2, fg=fg,
+            tk.Button(rf2, text=ch, width=w, bg=self.estilo.bg2, fg=fg,
                       font=F_SMALL, relief="flat", bd=0,
-                      activebackground=BORDER, command=cmd
+                      activebackground=self.estilo.border, command=cmd
             ).pack(side="left", padx=2)
 
     def _type(self, ch: str):

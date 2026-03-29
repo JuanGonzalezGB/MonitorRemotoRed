@@ -12,19 +12,7 @@ from controlador.network import get_local_ip
 from vista.dialogs import RenameDialog
 from vista.settings_dialog import SettingsDialog
 from vista.speed_panel import SpeedPanel
-from vista.gui_dictionary import COLORS, FORMATS 
-
-
-BG      = COLORS["BG"]
-BG2     = COLORS["BG2"]
-BORDER  = COLORS["BORDER"]
-COLOR1   = COLORS["GREEN"]
-COLOR2  = COLORS["ORANGE"]
-COLOR3     = COLORS["RED"]
-COLOR4    = COLORS["CYAN"]
-COLOR5    = COLORS["BLUE"]
-MUTED   = COLORS["MUTED"]
-COLOR6   = COLORS["WHITE"]
+from vista.gui_dictionary import FORMATS 
 
 
 F_TITLE  = FORMATS["F_TITLE"]
@@ -41,8 +29,10 @@ class Dashboard(tk.Tk):
     def __init__(self, config: Config, bw: BandwidthMonitor,
                  on_force_scan: Callable,
                  on_settings_change: Callable[[str, int, dict], None],
-                 on_rename: Callable[[str, str], None]):
+                 on_rename: Callable[[str, str], None],
+                 estilo):
         super().__init__()
+        self.estilo = estilo
         self.config = config
         self.bw = bw
         self.on_force_scan = on_force_scan
@@ -57,59 +47,72 @@ class Dashboard(tk.Tk):
         self.geometry("480x280")
         self.resizable(False, True)
         self.maxsize(480, 300)
-        self.configure(bg=BG)
+        self.configure(bg=self.estilo.bg)
         self.overrideredirect(False)
 
         self._build_ui()
         self._tick_clock()
 
     def _build_ui(self):
-        hdr = tk.Frame(self, bg=BG)
+        hdr = tk.Frame(self, bg=self.estilo.bg)
         hdr.pack(fill="x", padx=8, pady=(6, 0))
-        tk.Label(hdr, text="NET MONITOR", bg=BG, fg=COLOR4,
+        tk.Label(hdr, text="NET MONITOR", bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_TITLE).pack(side="left")
-        tk.Button(hdr, text="⚙", bg=BG, fg=MUTED,
+        tk.Button(hdr, text="⚙", bg=self.estilo.bg, fg=self.estilo.muted,
                   font=("monospace", 11), relief="flat", bd=0,
-                  activebackground=BG, activeforeground=COLOR4, cursor="hand2",
+                  activebackground=self.estilo.bg, activeforeground=self.estilo.cyan, cursor="hand2",
                   command=self._open_settings).pack(side="left", padx=(6, 0))
-        tk.Button(hdr, text="↑↓", bg=BG, fg=MUTED,
+        tk.Button(hdr, text="↑↓", bg=self.estilo.bg, fg=self.estilo.muted,
                   font=("monospace", 11), relief="flat", bd=0,
-                  activebackground=BG, activeforeground=COLOR4, cursor="hand2",
+                  activebackground=self.estilo.bg, activeforeground=self.estilo.cyan, cursor="hand2",
                   command=self._open_host_speed).pack(side="left", padx=(4, 0))
-        self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
+        tk.Button(
+            hdr,
+            text="🎨",
+            bg=self.estilo.bg,
+            fg=self.estilo.muted,
+            font=("monospace", 11),
+            relief="flat",
+            bd=0,
+            activebackground=self.estilo.bg,
+            activeforeground=self.estilo.cyan,
+            cursor="hand2",
+            command=self._open_theme_selector
+        ).pack(side="left", padx=(4, 0))        
+        self.lbl_time = tk.Label(hdr, text="", bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_time.pack(side="right")
         self.lbl_counts = tk.Label(hdr, text="escaneando...",
-                                   bg=BG, fg=MUTED, font=F_SMALL)
+                                   bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_counts.pack(side="right", padx=12)
 
-        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8, pady=(3, 0))
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(fill="x", padx=8, pady=(3, 0))
 
-        col_hdr = tk.Frame(self, bg=BG)
+        col_hdr = tk.Frame(self, bg=self.estilo.bg)
         col_hdr.pack(fill="x", padx=8, pady=(2, 0))
         for txt, w, anchor in [
             ("", 2, "w"), ("nombre", COL_NAME, "w"),
             ("ip / mac", COL_IP, "w"), ("vendor", COL_VENDOR, "w"),
             ("ping", COL_PING, "e")
         ]:
-            tk.Label(col_hdr, text=txt, bg=BG, fg=MUTED,
+            tk.Label(col_hdr, text=txt, bg=self.estilo.bg, fg=self.estilo.muted,
                      font=F_SMALL, width=w, anchor=anchor).pack(side="left", padx=1)
 
-        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8, pady=(1, 0))
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(fill="x", padx=8, pady=(1, 0))
 
-        self.list_frame = tk.Frame(self, bg=BG)
+        self.list_frame = tk.Frame(self, bg=self.estilo.bg)
         self.list_frame.pack(fill="both", expand=True, padx=8)
 
-        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8, pady=(0, 2))
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(fill="x", padx=8, pady=(0, 2))
 
-        ftr = tk.Frame(self, bg=BG)
+        ftr = tk.Frame(self, bg=self.estilo.bg)
         ftr.pack(fill="x", padx=8, pady=(0, 4))
         self.lbl_last = tk.Label(ftr, text="Esperando scan...",
-                                 bg=BG, fg=MUTED, font=F_SMALL)
+                                 bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_last.pack(side="left")
         self.lbl_subnet = tk.Label(ftr, text=self.config.subnet,
-                                   bg=BG, fg=MUTED, font=F_SMALL)
+                                   bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_subnet.pack(side="left", padx=8)
-        self.btn_scan = tk.Button(ftr, text="Scan", bg="#0f2520", fg=COLOR4,
+        self.btn_scan = tk.Button(ftr, text="Scan", bg=self.estilo.boton, fg=self.estilo.cyan,
                                   font=F_SMALL, relief="flat", bd=0, padx=6,
                                   command=self.on_force_scan)
         self.btn_scan.pack(side="right")
@@ -117,17 +120,17 @@ class Dashboard(tk.Tk):
     # ── Rows ─────────────────────────────────────────────────────────────────
 
     def _make_row(self, mac: str):
-        frame = tk.Frame(self.list_frame, bg=BG2, pady=2)
+        frame = tk.Frame(self.list_frame, bg=self.estilo.bg2, pady=2)
         frame.pack(fill="x", pady=1)
 
-        dot    = tk.Label(frame, text="●", bg=BG2, fg=MUTED, font=F_SMALL, width=2)
-        name   = tk.Label(frame, text="", bg=BG2, fg=COLOR4, font=F_NORMAL,
+        dot    = tk.Label(frame, text="●", bg=self.estilo.bg2, fg=self.estilo.muted, font=F_SMALL, width=2)
+        name   = tk.Label(frame, text="", bg=self.estilo.bg2, fg=self.estilo.cyan, font=F_NORMAL,
                           width=COL_NAME, anchor="w", cursor="hand2")
-        lbl_ip = tk.Label(frame, text="", bg=BG2, fg=COLOR5, font=F_SMALL,
+        lbl_ip = tk.Label(frame, text="", bg=self.estilo.bg2, fg=self.estilo.blue, font=F_SMALL,
                           width=COL_IP, anchor="w", cursor="hand2")
-        vendor = tk.Label(frame, text="", bg=BG2, fg=MUTED, font=F_SMALL,
+        vendor = tk.Label(frame, text="", bg=self.estilo.bg2, fg=self.estilo.muted, font=F_SMALL,
                           width=COL_VENDOR, anchor="w")
-        ping   = tk.Label(frame, text="---", bg=BG2, fg=MUTED, font=F_NORMAL,
+        ping   = tk.Label(frame, text="---", bg=self.estilo.bg2, fg=self.estilo.muted, font=F_NORMAL,
                           width=COL_PING, anchor="e")
 
         for w in (dot, name, lbl_ip, vendor, ping):
@@ -154,17 +157,17 @@ class Dashboard(tk.Tk):
         row["vendor"].config(text=device.vendor[:COL_VENDOR])
 
         if not self._show_mac.get(mac, False):
-            row["lbl_ip"].config(text=device.ip[:COL_IP], fg=COLOR5)
+            row["lbl_ip"].config(text=device.ip[:COL_IP], fg=self.estilo.blue)
 
         if not device.online:
-            row["dot"].config(fg=COLOR3)
-            row["ping"].config(text="---", fg=COLOR3)
+            row["dot"].config(fg=self.estilo.red)
+            row["ping"].config(text="---", fg=self.estilo.red)
             row["ping"].config(cursor="")
             row["ping"].unbind("<Button-1>")
         else:
             ms = int(device.ping_ms)
-            color = COLOR2 if ms > self.config.ping_warn_ms else COLOR1
-            row["dot"].config(fg=COLOR1)
+            color = self.estilo.orange if ms > self.config.ping_warn_ms else self.estilo.green
+            row["dot"].config(fg=self.estilo.green)
             row["ping"].config(text=f"{ms}ms", fg=color)
 
             # Speed panel solo en el host
@@ -200,9 +203,9 @@ class Dashboard(tk.Tk):
         self._show_mac[mac] = not self._show_mac.get(mac, False)
         row = self.rows[mac]
         if self._show_mac[mac]:
-            row["lbl_ip"].config(text=mac[:COL_IP], fg=MUTED)
+            row["lbl_ip"].config(text=mac[:COL_IP], fg=self.estilo.muted)
         else:
-            row["lbl_ip"].config(text=row["ip"][:COL_IP], fg=COLOR5)
+            row["lbl_ip"].config(text=row["ip"][:COL_IP], fg=self.estilo.blue)
 
     def _open_rename(self, mac: str):
         ip = self.rows[mac]["ip"]
@@ -217,12 +220,12 @@ class Dashboard(tk.Tk):
     def _open_speed(self, mac: str):
         ip = self.rows[mac]["ip"]
         label = self.config.device_name(mac) or ip.split(".")[-1]
-        SpeedPanel(self, label, ip, mac, self.bw)
+        SpeedPanel(self.estilo,self, label, ip, mac, self.bw)
 
     def _open_host_speed(self):
         from vista.speed_panel import SpeedPanel
         local_ip = self._local_ip or "este equipo"
-        SpeedPanel(self, "Host", local_ip, "", self.bw)
+        SpeedPanel(self.estilo, self, "Host", local_ip, "", self.bw)
 
     def _open_settings(self):
         SettingsDialog(
@@ -230,8 +233,12 @@ class Dashboard(tk.Tk):
             current_subnet=self.config.subnet,
             current_interval=self.config.scan_interval,
             current_mongo=self.config.mongo,
-            on_save=self._handle_settings_save
+            on_save=self._handle_settings_save,
+            estilo=self.estilo
         )
+    def _open_theme_selector(self):
+        from vista.selectema import ThemeSelector
+        ThemeSelector(self, self.estilo)
 
     def _handle_settings_save(self, subnet: str, interval: int, mongo: dict):
         self.lbl_subnet.config(text=subnet)

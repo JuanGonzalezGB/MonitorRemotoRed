@@ -12,6 +12,7 @@ DEFAULT = {
     "subnet": "192.168.0.0/24",
     "scan_interval": 2,
     "ping_warn_ms": 20,
+    "theme": "dark",   
     "mongodb": {
         "host": "localhost",
         "port": 27017,
@@ -231,3 +232,11 @@ class Config:
     @property
     def ping_warn_ms(self) -> int:
         return self._data.get("ping_warn_ms", DEFAULT["ping_warn_ms"])
+    @property
+    def theme(self) -> str:
+        return self._data.get("theme", DEFAULT["theme"])
+
+    @theme.setter
+    def theme(self, value: str):
+        self._data["theme"] = value
+        self._save_json()

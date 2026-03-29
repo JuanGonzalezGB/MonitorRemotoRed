@@ -5,13 +5,6 @@ import tkinter as tk
 from modelo.bandwidth import BandwidthMonitor
 from vista.gui_dictionary import COLORS, FORMATS, GRAPHFORMAT
 
-BG      = COLORS["BG"]
-BG2     = COLORS["BG2"]
-BORDER  = COLORS["BORDER"]
-COLOR1   = COLORS["GREEN"]
-COLOR2    = COLORS["CYAN"]
-MUTED   = COLORS["MUTED"]
-
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]
 
@@ -31,9 +24,10 @@ def fmt_kbs(kbs: float) -> str:
 
 
 class SpeedPanel(tk.Toplevel):
-    def __init__(self, parent, label: str, ip: str,
+    def __init__(self, estilo, parent, label: str, ip: str,
                  mac: str, bw: BandwidthMonitor):
         super().__init__(parent)
+        self.estilo = estilo
         self.bw = bw
         self.ip = ip
         self._running = True
@@ -41,59 +35,59 @@ class SpeedPanel(tk.Toplevel):
         self._peak_tx = 0.0
 
         self.overrideredirect(True)
-        self.configure(bg=BG)
+        self.configure(bg=self.estilo.bg)
         self.geometry(f"480x200+{parent.winfo_x()}+{parent.winfo_y()}")
         self._build(label, mac)
         self.grab_set()
         self._update()
 
     def _build(self, label: str, mac: str):
-        hdr = tk.Frame(self, bg=BG)
+        hdr = tk.Frame(self, bg=self.estilo.bg)
         hdr.pack(fill="x", padx=10, pady=(8, 4))
-        tk.Label(hdr, text=f"{label}  {self.ip}", bg=BG, fg=COLOR2,
+        tk.Label(hdr, text=f"{label}  {self.ip}", bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_NORMAL).pack(side="left")
-        tk.Label(hdr, text=mac, bg=BG, fg=MUTED,
+        tk.Label(hdr, text=mac, bg=self.estilo.bg, fg=self.estilo.muted,
                  font=F_SMALL).pack(side="left", padx=8)
-        tk.Button(hdr, text="✕", bg=BG, fg=MUTED, font=F_SMALL,
+        tk.Button(hdr, text="✕", bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL,
                   relief="flat", bd=0, command=self._close).pack(side="right")
 
-        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=8)
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(fill="x", padx=8)
 
-        stats = tk.Frame(self, bg=BG)
+        stats = tk.Frame(self, bg=self.estilo.bg)
         stats.pack(fill="x", padx=10, pady=(6, 2))
-        self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=BG,
-                               fg=COLOR1, font=("monospace", 10))
+        self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=self.estilo.bg,
+                               fg=self.estilo.green, font=("monospace", 10))
         self.lbl_rx.pack(side="left", padx=(0, 20))
-        self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=BG,
-                               fg=COLOR2, font=("monospace", 10))
+        self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=self.estilo.bg,
+                               fg=self.estilo.cyan, font=("monospace", 10))
         self.lbl_tx.pack(side="left")
-        tk.Label(stats, text="(este equipo)", bg=BG, fg=MUTED,
+        tk.Label(stats, text="(este equipo)", bg=self.estilo.bg, fg=self.estilo.muted,
                  font=F_SMALL).pack(side="right")
 
         self.canvas = tk.Canvas(self, width=GRAPH_W, height=GRAPH_H,
-                                bg=BG2, highlightthickness=0)
+                                bg=self.estilo.bg2, highlightthickness=0)
         self.canvas.pack(padx=10, pady=(4, 0))
 
-        leg = tk.Frame(self, bg=BG)
+        leg = tk.Frame(self, bg=self.estilo.bg)
         leg.pack(fill="x", padx=10, pady=(4, 6))
-        rx_col = tk.Frame(leg, bg=BG)
+        rx_col = tk.Frame(leg, bg=self.estilo.bg)
         rx_col.pack(side="left")
         self.lbl_rx_mbps = tk.Label(rx_col, text="— descarga  0.0 Mbps",
-                                     bg=BG, fg=COLOR1, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.green, font=F_SMALL)
         self.lbl_rx_mbps.pack(anchor="w")
         self.lbl_rx_peak = tk.Label(rx_col, text="  peak  0.0 Mbps",
-                                     bg=BG, fg=MUTED, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_rx_peak.pack(anchor="w")
 
-        tx_col = tk.Frame(leg, bg=BG)
+        tx_col = tk.Frame(leg, bg=self.estilo.bg)
         tx_col.pack(side="left", padx=12)
         self.lbl_tx_mbps = tk.Label(tx_col, text="— subida  0.0 Mbps",
-                                     bg=BG, fg=COLOR2, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL)
         self.lbl_tx_mbps.pack(anchor="w")
         self.lbl_tx_peak = tk.Label(tx_col, text="  peak  0.0 Mbps",
-                                     bg=BG, fg=MUTED, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         self.lbl_tx_peak.pack(anchor="w")
-        tk.Button(leg, text="Cerrar", bg=BG2, fg=MUTED,
+        tk.Button(leg, text="Cerrar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=8,
                   command=self._close).pack(side="right")
 
@@ -118,7 +112,7 @@ class SpeedPanel(tk.Toplevel):
         if not rx_hist and not tx_hist:
             self.canvas.create_text(GRAPH_W // 2, GRAPH_H // 2,
                                     text="recopilando datos...",
-                                    fill=MUTED, font=F_SMALL)
+                                    fill=self.estilo.muted, font=F_SMALL)
             return
 
         max_val = max(max(rx_hist + tx_hist), 0.1)
@@ -137,12 +131,12 @@ class SpeedPanel(tk.Toplevel):
         for pct in [0.25, 0.5, 0.75]:
             y = int(GRAPH_H - 4 - pct * (GRAPH_H - 8))
             self.canvas.create_line(2, y, GRAPH_W - 2, y,
-                                    fill=BORDER, width=1)
+                                    fill=self.estilo.border, width=1)
 
-        draw_line(rx_hist, COLOR1)
-        draw_line(tx_hist, COLOR2)
+        draw_line(rx_hist, self.estilo.green)
+        draw_line(tx_hist, self.estilo.cyan)
         self.canvas.create_text(GRAPH_W - 4, 4, text=fmt_kbs(max_val),
-                                fill=MUTED, font=F_SMALL, anchor="ne")
+                                fill=self.estilo.muted, font=F_SMALL, anchor="ne")
 
     def _close(self):
         self._running = False

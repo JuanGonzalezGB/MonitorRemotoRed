@@ -5,16 +5,7 @@ import tkinter as tk
 from typing import Callable
 
 from vista.keyboards import VirtualKeyboard, Numpad
-from vista.gui_dictionary import COLORS, FORMATS
-
-BG      = COLORS["BG"]
-BG2     = COLORS["BG2"]
-BORDER  = COLORS["BORDER"]
-COLOR1    = COLORS["CYAN"]
-COLOR2   = COLORS["WHITE"]
-MUTED   = COLORS["MUTED"]
-
-
+from vista.gui_dictionary import FORMATS
 
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]
@@ -22,38 +13,39 @@ F_SMALL  = FORMATS["F_SMALL"]
 
 class RenameDialog(tk.Toplevel):
     def __init__(self, parent, mac: str, ip: str,
-                 current_name: str, on_save: Callable[[str, str], None]):
+                 current_name: str, on_save: Callable[[str, str], None],estilo):
         super().__init__(parent)
+        self.estilo=estilo
         self.on_save = on_save
         self.mac = mac
         self.ip = ip
         self.overrideredirect(True)
-        self.configure(bg=BG)
+        self.configure(bg=self.estilo.bg)
         self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
         self._build(current_name)
         self.grab_set()
 
     def _build(self, current_name: str):
         tk.Label(self, text=f"Renombrar  {self.ip}  ({self.mac})",
-                 bg=BG, fg=COLOR1, font=F_SMALL).pack(pady=(12, 4))
+                 bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL).pack(pady=(12, 4))
 
-        ef = tk.Frame(self, bg=BORDER, padx=1, pady=1)
+        ef = tk.Frame(self, bg=self.estilo.border, padx=1, pady=1)
         ef.pack(padx=24, fill="x")
-        self.entry = tk.Entry(ef, bg=BG2, fg=COLOR2, insertbackground=COLOR1,
+        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white, insertbackground=self.estilo.cyan,
                               font=("monospace", 12), relief="flat", bd=4)
         self.entry.insert(0, current_name)
         self.entry.pack(fill="x")
         self.entry.focus_set()
         self.entry.icursor("end")
 
-        VirtualKeyboard(self, self.entry).pack(pady=(8, 0), padx=8)
+        VirtualKeyboard(self, self.estilo, self.entry).pack(pady=(8, 0), padx=8)
 
-        bf = tk.Frame(self, bg=BG)
+        bf = tk.Frame(self, bg=self.estilo.bg)
         bf.pack(pady=(8, 0))
-        tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
+        tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
-        tk.Button(bf, text="Guardar", bg="#0f2520", fg=COLOR1,
+        tk.Button(bf, text="Guardar", bg="#0f2520", fg=self.estilo.cyan,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self._save).pack(side="left", padx=6)
 
@@ -73,18 +65,18 @@ class NumpadDialog(tk.Toplevel):
         super().__init__(parent)
         self.on_save = on_save
         self.overrideredirect(True)
-        self.configure(bg=BG)
+        self.configure(bg=self.estilo.bg)
         self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
         self._build(title, value)
         self.grab_set()
 
     def _build(self, title: str, value: str):
-        tk.Label(self, text=title, bg=BG, fg=COLOR1,
+        tk.Label(self, text=title, bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_SMALL).pack(pady=(8, 4))
 
-        ef = tk.Frame(self, bg=BORDER, padx=1, pady=1)
+        ef = tk.Frame(self, bg=self.estilo.border, padx=1, pady=1)
         ef.pack(padx=60, fill="x")
-        self.entry = tk.Entry(ef, bg=BG2, fg=COLOR2, insertbackground=COLOR1,
+        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white, insertbackground=self.estilo.cyan,
                               font=("monospace", 11), relief="flat", bd=3,
                               justify="center")
         self.entry.insert(0, value)
@@ -94,12 +86,12 @@ class NumpadDialog(tk.Toplevel):
 
         Numpad(self, self.entry).pack(pady=(8, 0))
 
-        bf = tk.Frame(self, bg=BG)
+        bf = tk.Frame(self, bg=self.estilo.bg)
         bf.pack(pady=(10, 0))
-        tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
+        tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
-        tk.Button(bf, text="Guardar", bg="#0f2520", fg=COLOR1,
+        tk.Button(bf, text="Guardar", bg="#0f2520", fg=self.estilo.cyan,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self._save).pack(side="left", padx=6)
 

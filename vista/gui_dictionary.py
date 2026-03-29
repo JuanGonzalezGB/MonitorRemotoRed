@@ -1,3 +1,16 @@
+from estilo import dark, light
+
+TEMAS = {
+    "Oscuro": "dark",
+    "Claro": "light",
+}
+
+CLASESTEMAS = {
+    "dark": dark.DarkColor,
+    "light": light.LightColor,
+}
+
+
 COLORS = {
     "BG"      : "#0f0f12",
     "BG2"     : "#161620",
@@ -11,18 +24,6 @@ COLORS = {
     "WHITE"   : "#e0e0e8"
 }
 
-COLORS_LIGHT = {
-    "BG"      : "#f5f5f0",
-    "BG2"     : "#ebebe5",
-    "BORDER"  : "#d0d0c8",
-    "GREEN"   : "#1a7a3a",
-    "ORANGE"  : "#b85c00",
-    "RED"     : "#c0392b",
-    "CYAN"    : "#1a7a6a",
-    "BLUE"    : "#2a5fa8",
-    "MUTED"   : "#8a8a7a",
-    "WHITE"   : "#1a1a18"
-}
 
 GRAPHFORMAT = {
     "GRAPH_W" : 440,

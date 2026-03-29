@@ -8,11 +8,16 @@ from modelo.bandwidth import BandwidthMonitor
 from controlador.network import preflight
 from controlador.scanner import ScannerController
 from vista.dashboard import Dashboard
+from estilo import estiloFactory
 
 
 def main():
     if not preflight():
         sys.exit(1)
+    config = Config()
+    tema = config.theme
+
+    estilo = estiloFactory.EstiloFactory.definirEstilo(tema)
 
     config = Config()
     cache  = StateCache()
@@ -25,6 +30,7 @@ def main():
         on_force_scan=lambda: scanner.force_scan(),
         on_settings_change=lambda s, i, m: _on_settings_change(s, i, m),
         on_rename=lambda mac, name: config.set_device_name(mac, name),
+        estilo=estilo
     )
 
     def _on_scan_result(devices):

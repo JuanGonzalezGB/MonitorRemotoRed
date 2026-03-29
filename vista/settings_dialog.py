@@ -8,26 +8,20 @@ from typing import Callable
 from vista.keyboards import Numpad, VirtualKeyboard
 from vista.gui_dictionary import COLORS, FORMATS
 
-BG      = COLORS["BG"]
-BG2     = COLORS["BG2"]
-BORDER  = COLORS["BORDER"]
-COLOR1    = COLORS["CYAN"]
-COLOR2   = COLORS["WHITE"]
-MUTED   = COLORS["MUTED"]
-
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]
 
 
 
-def _labeled_entry(parent, label: str, value: str, show: str = "") -> tk.Entry:
-    row = tk.Frame(parent, bg=BG)
+def _labeled_entry(estilo, parent, label: str, value: str, show: str = "") -> tk.Entry:
+    
+    row = tk.Frame(parent, bg=estilo.bg)
     row.pack(fill="x", pady=(4, 0))
-    tk.Label(row, text=label, bg=BG, fg=MUTED,
+    tk.Label(row, text=label, bg=estilo.bg, fg=estilo.muted,
              font=F_SMALL, width=16, anchor="w").pack(side="left")
-    ef = tk.Frame(row, bg=BORDER, padx=1, pady=1)
+    ef = tk.Frame(row, bg=estilo.border, padx=1, pady=1)
     ef.pack(side="left", fill="x", expand=True)
-    entry = tk.Entry(ef, bg=BG2, fg=COLOR2, insertbackground=COLOR1,
+    entry = tk.Entry(ef, bg=estilo.bg2, fg=estilo.white, insertbackground=estilo.cyan,
                      font=("monospace", 9), relief="flat", bd=2, show=show)
     entry.insert(0, value)
     entry.pack(fill="x")
@@ -39,11 +33,13 @@ class SettingsDialog(tk.Toplevel):
                  current_subnet: str,
                  current_interval: int,
                  current_mongo: dict,
-                 on_save: Callable[[str, int, dict], None]):
+                 on_save: Callable[[str, int, dict], None],
+                 estilo):
         super().__init__(parent)
+        self.estilo=estilo
         self.on_save = on_save
         self.overrideredirect(True)
-        self.configure(bg=BG)
+        self.configure(bg=self.estilo.bg)
         self.geometry(f"480x260+{parent.winfo_x()}+{parent.winfo_y()}")
         self._kb_frame: tk.Frame | None = None
         self._build(current_subnet, current_interval, current_mongo)
@@ -51,33 +47,33 @@ class SettingsDialog(tk.Toplevel):
 
     def _build(self, subnet: str, interval: int, mongo: dict):
         # Título fijo arriba
-        tk.Label(self, text="Configuración", bg=BG, fg=COLOR1,
+        tk.Label(self, text="Configuración", bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_NORMAL).pack(pady=(8, 4))
-        tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=12)
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(fill="x", padx=12)
 
         # Botones fijos abajo
-        bf = tk.Frame(self, bg=BG)
+        bf = tk.Frame(self, bg=self.estilo.bg)
         bf.pack(side="bottom", pady=(4, 6))
-        tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
+        tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
-        tk.Button(bf, text="Guardar", bg="#0f2520", fg=COLOR1,
+        tk.Button(bf, text="Guardar", bg=self.estilo.boton, fg=self.estilo.cyan,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self._save).pack(side="left", padx=6)
 
-        tk.Frame(self, bg=BORDER, height=1).pack(side="bottom", fill="x", padx=12)
+        tk.Frame(self, bg=self.estilo.border, height=1).pack(side="bottom", fill="x", padx=12)
 
         # Canvas + scrollbar — ocupa el espacio restante
-        outer = tk.Frame(self, bg=BG)
+        outer = tk.Frame(self, bg=self.estilo.bg)
         outer.pack(fill="both", expand=True, padx=12, pady=(4, 0))
 
-        canvas = tk.Canvas(outer, bg=BG, highlightthickness=0)
+        canvas = tk.Canvas(outer, bg=self.estilo.bg, highlightthickness=0)
         sb = tk.Scrollbar(outer, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=sb.set)
         sb.pack(side="right", fill="y")
         canvas.pack(side="left", fill="both", expand=True)
 
-        self._scroll_frame = tk.Frame(canvas, bg=BG)
+        self._scroll_frame = tk.Frame(canvas, bg=self.estilo.bg)
         win = canvas.create_window((0, 0), window=self._scroll_frame, anchor="nw")
 
         def _on_frame_configure(e):
@@ -94,30 +90,30 @@ class SettingsDialog(tk.Toplevel):
         canvas.bind_all("<MouseWheel>", _on_wheel)
 
         # ── Campos de red ─────────────────────────────────────────────────────
-        tk.Label(self._scroll_frame, text="Red", bg=BG, fg=COLOR1,
+        tk.Label(self._scroll_frame, text="Red", bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_SMALL).pack(anchor="w", pady=(4, 2))
 
-        self.e_subnet   = _labeled_entry(self._scroll_frame, "Subred", subnet)
-        self.e_interval = _labeled_entry(self._scroll_frame, "Refresco (seg)", str(interval))
+        self.e_subnet   = _labeled_entry(self.estilo,self._scroll_frame, "Subred", subnet)
+        self.e_interval = _labeled_entry(self.estilo,self._scroll_frame, "Refresco (seg)", str(interval))
 
-        tk.Frame(self._scroll_frame, bg=BORDER, height=1).pack(fill="x", pady=(8, 2))
+        tk.Frame(self._scroll_frame, bg=self.estilo.border, height=1).pack(fill="x", pady=(8, 2))
 
         # ── Campos MongoDB ────────────────────────────────────────────────────
-        tk.Label(self._scroll_frame, text="MongoDB", bg=BG, fg=COLOR1,
+        tk.Label(self._scroll_frame, text="MongoDB", bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_SMALL).pack(anchor="w", pady=(0, 2))
 
-        self.e_host = _labeled_entry(self._scroll_frame, "Host", mongo.get("host", ""))
-        self.e_port = _labeled_entry(self._scroll_frame, "Puerto", str(mongo.get("port", 27017)))
-        self.e_user = _labeled_entry(self._scroll_frame, "Usuario", mongo.get("user", ""))
-        self.e_pass = _labeled_entry(self._scroll_frame, "Contraseña",
+        self.e_host = _labeled_entry(self.estilo,self._scroll_frame, "Host", mongo.get("host", ""))
+        self.e_port = _labeled_entry(self.estilo,self._scroll_frame, "Puerto", str(mongo.get("port", 27017)))
+        self.e_user = _labeled_entry(self.estilo,self._scroll_frame, "Usuario", mongo.get("user", ""))
+        self.e_pass = _labeled_entry(self.estilo,self._scroll_frame, "Contraseña",
                                      mongo.get("password", ""), show="●")
-        self.e_db   = _labeled_entry(self._scroll_frame, "Base de datos",
+        self.e_db   = _labeled_entry(self.estilo,self._scroll_frame, "Base de datos",
                                      mongo.get("db", "scanner"))
 
-        tk.Frame(self._scroll_frame, bg=BORDER, height=1).pack(fill="x", pady=(8, 2))
+        tk.Frame(self._scroll_frame, bg=self.estilo.border, height=1).pack(fill="x", pady=(8, 2))
 
         # ── Teclado dentro del scroll ─────────────────────────────────────────
-        self._kb_frame = tk.Frame(self._scroll_frame, bg=BG)
+        self._kb_frame = tk.Frame(self._scroll_frame, bg=self.estilo.bg)
         self._kb_frame.pack(pady=(4, 8))
 
         # Binds de foco
@@ -137,9 +133,9 @@ class SettingsDialog(tk.Toplevel):
         for w in self._kb_frame.winfo_children():
             w.destroy()
         if kb_type == "numpad":
-            Numpad(self._kb_frame, entry).pack()
+            Numpad(self.estilo,self._kb_frame, entry).pack()
         else:
-            VirtualKeyboard(self._kb_frame, entry).pack()
+            VirtualKeyboard(self.estilo, self._kb_frame, entry).pack()
 
     def _save(self):
         subnet = self.e_subnet.get().strip()
