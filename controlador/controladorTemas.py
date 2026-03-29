@@ -43,7 +43,7 @@ class ControladorTemas:
                 activebackground=estilo.colorBg2()
             )
 
-        # Entry (te falta esto y es clave)
+        # Entry 
         elif isinstance(widget, tk.Entry):
             widget.config(
                 bg=estilo.colorBg2(),
@@ -87,8 +87,6 @@ class ControladorTemas:
             self._aplicar_recursivo(child, estilo)
 
     def aceptarTema(self, tipo):
-        # guardar en config (esto reemplaza saveConfig)
         self.root.master.config.theme = tipo
 
-        # aplicar tema (lo mismo que preview)
         self._aplicar_recursivo(self.root.master, EstiloFactory.definirEstilo(tipo))          
