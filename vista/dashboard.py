@@ -12,26 +12,29 @@ from controlador.network import get_local_ip
 from vista.dialogs import RenameDialog
 from vista.settings_dialog import SettingsDialog
 from vista.speed_panel import SpeedPanel
+from vista.gui_dictionary import COLORS, FORMATS 
 
-BG      = "#0f0f12"
-BG2     = "#161620"
-BORDER  = "#1e1e2a"
-GREEN   = "#3ddc84"
-ORANGE  = "#f0a030"
-RED     = "#e05252"
-CYAN    = "#7fd4c1"
-BLUE    = "#7a9fd4"
-MUTED   = "#4a4a5a"
-WHITE   = "#e0e0e8"
 
-F_TITLE  = ("monospace", 10, "bold")
-F_NORMAL = ("monospace", 9)
-F_SMALL  = ("monospace", 8)
+BG      = COLORS["BG"]
+BG2     = COLORS["BG2"]
+BORDER  = COLORS["BORDER"]
+COLOR1   = COLORS["GREEN"]
+COLOR2  = COLORS["ORANGE"]
+COLOR3     = COLORS["RED"]
+COLOR4    = COLORS["CYAN"]
+COLOR5    = COLORS["BLUE"]
+MUTED   = COLORS["MUTED"]
+COLOR6   = COLORS["WHITE"]
 
-COL_NAME   = 14
-COL_IP     = 15
-COL_VENDOR = 12
-COL_PING   =  6
+
+F_TITLE  = FORMATS["F_TITLE"]
+F_NORMAL = FORMATS["F_NORMAL"]
+F_SMALL  = FORMATS["F_SMALL"]
+
+COL_NAME   = FORMATS["COL_NAME"]
+COL_IP     = FORMATS["COL_IP"]
+COL_VENDOR = FORMATS["COL_VENDOR"]
+COL_PING   = FORMATS["COL_PING"]
 
 
 class Dashboard(tk.Tk):
@@ -63,15 +66,15 @@ class Dashboard(tk.Tk):
     def _build_ui(self):
         hdr = tk.Frame(self, bg=BG)
         hdr.pack(fill="x", padx=8, pady=(6, 0))
-        tk.Label(hdr, text="NET MONITOR", bg=BG, fg=CYAN,
+        tk.Label(hdr, text="NET MONITOR", bg=BG, fg=COLOR4,
                  font=F_TITLE).pack(side="left")
         tk.Button(hdr, text="⚙", bg=BG, fg=MUTED,
                   font=("monospace", 11), relief="flat", bd=0,
-                  activebackground=BG, activeforeground=CYAN, cursor="hand2",
+                  activebackground=BG, activeforeground=COLOR4, cursor="hand2",
                   command=self._open_settings).pack(side="left", padx=(6, 0))
         tk.Button(hdr, text="↑↓", bg=BG, fg=MUTED,
                   font=("monospace", 11), relief="flat", bd=0,
-                  activebackground=BG, activeforeground=CYAN, cursor="hand2",
+                  activebackground=BG, activeforeground=COLOR4, cursor="hand2",
                   command=self._open_host_speed).pack(side="left", padx=(4, 0))
         self.lbl_time = tk.Label(hdr, text="", bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_time.pack(side="right")
@@ -106,7 +109,7 @@ class Dashboard(tk.Tk):
         self.lbl_subnet = tk.Label(ftr, text=self.config.subnet,
                                    bg=BG, fg=MUTED, font=F_SMALL)
         self.lbl_subnet.pack(side="left", padx=8)
-        self.btn_scan = tk.Button(ftr, text="Scan", bg="#0f2520", fg=CYAN,
+        self.btn_scan = tk.Button(ftr, text="Scan", bg="#0f2520", fg=COLOR4,
                                   font=F_SMALL, relief="flat", bd=0, padx=6,
                                   command=self.on_force_scan)
         self.btn_scan.pack(side="right")
@@ -118,9 +121,9 @@ class Dashboard(tk.Tk):
         frame.pack(fill="x", pady=1)
 
         dot    = tk.Label(frame, text="●", bg=BG2, fg=MUTED, font=F_SMALL, width=2)
-        name   = tk.Label(frame, text="", bg=BG2, fg=CYAN, font=F_NORMAL,
+        name   = tk.Label(frame, text="", bg=BG2, fg=COLOR4, font=F_NORMAL,
                           width=COL_NAME, anchor="w", cursor="hand2")
-        lbl_ip = tk.Label(frame, text="", bg=BG2, fg=BLUE, font=F_SMALL,
+        lbl_ip = tk.Label(frame, text="", bg=BG2, fg=COLOR5, font=F_SMALL,
                           width=COL_IP, anchor="w", cursor="hand2")
         vendor = tk.Label(frame, text="", bg=BG2, fg=MUTED, font=F_SMALL,
                           width=COL_VENDOR, anchor="w")
@@ -151,17 +154,17 @@ class Dashboard(tk.Tk):
         row["vendor"].config(text=device.vendor[:COL_VENDOR])
 
         if not self._show_mac.get(mac, False):
-            row["lbl_ip"].config(text=device.ip[:COL_IP], fg=BLUE)
+            row["lbl_ip"].config(text=device.ip[:COL_IP], fg=COLOR5)
 
         if not device.online:
-            row["dot"].config(fg=RED)
-            row["ping"].config(text="---", fg=RED)
+            row["dot"].config(fg=COLOR3)
+            row["ping"].config(text="---", fg=COLOR3)
             row["ping"].config(cursor="")
             row["ping"].unbind("<Button-1>")
         else:
             ms = int(device.ping_ms)
-            color = ORANGE if ms > self.config.ping_warn_ms else GREEN
-            row["dot"].config(fg=GREEN)
+            color = COLOR2 if ms > self.config.ping_warn_ms else COLOR1
+            row["dot"].config(fg=COLOR1)
             row["ping"].config(text=f"{ms}ms", fg=color)
 
             # Speed panel solo en el host
@@ -199,7 +202,7 @@ class Dashboard(tk.Tk):
         if self._show_mac[mac]:
             row["lbl_ip"].config(text=mac[:COL_IP], fg=MUTED)
         else:
-            row["lbl_ip"].config(text=row["ip"][:COL_IP], fg=BLUE)
+            row["lbl_ip"].config(text=row["ip"][:COL_IP], fg=COLOR5)
 
     def _open_rename(self, mac: str):
         ip = self.rows[mac]["ip"]

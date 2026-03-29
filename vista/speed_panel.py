@@ -3,19 +3,20 @@ view/speed_panel.py — panel flotante de velocidad del host
 """
 import tkinter as tk
 from modelo.bandwidth import BandwidthMonitor
+from vista.gui_dictionary import COLORS, FORMATS, GRAPHFORMAT
 
-BG      = "#0f0f12"
-BG2     = "#161620"
-BORDER  = "#1e1e2a"
-GREEN   = "#3ddc84"
-CYAN    = "#7fd4c1"
-MUTED   = "#4a4a5a"
+BG      = COLORS["BG"]
+BG2     = COLORS["BG2"]
+BORDER  = COLORS["BORDER"]
+COLOR1   = COLORS["GREEN"]
+COLOR2    = COLORS["CYAN"]
+MUTED   = COLORS["MUTED"]
 
-F_NORMAL = ("monospace", 9)
-F_SMALL  = ("monospace", 8)
+F_NORMAL = FORMATS["F_NORMAL"]
+F_SMALL  = FORMATS["F_SMALL"]
 
-GRAPH_W = 440
-GRAPH_H = 60
+GRAPH_W = GRAPHFORMAT["GRAPH_W"]
+GRAPH_H = GRAPHFORMAT["GRAPH_H"]
 
 
 def fmt_mbps(kbs: float) -> str:
@@ -49,7 +50,7 @@ class SpeedPanel(tk.Toplevel):
     def _build(self, label: str, mac: str):
         hdr = tk.Frame(self, bg=BG)
         hdr.pack(fill="x", padx=10, pady=(8, 4))
-        tk.Label(hdr, text=f"{label}  {self.ip}", bg=BG, fg=CYAN,
+        tk.Label(hdr, text=f"{label}  {self.ip}", bg=BG, fg=COLOR2,
                  font=F_NORMAL).pack(side="left")
         tk.Label(hdr, text=mac, bg=BG, fg=MUTED,
                  font=F_SMALL).pack(side="left", padx=8)
@@ -61,10 +62,10 @@ class SpeedPanel(tk.Toplevel):
         stats = tk.Frame(self, bg=BG)
         stats.pack(fill="x", padx=10, pady=(6, 2))
         self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=BG,
-                               fg=GREEN, font=("monospace", 10))
+                               fg=COLOR1, font=("monospace", 10))
         self.lbl_rx.pack(side="left", padx=(0, 20))
         self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=BG,
-                               fg=CYAN, font=("monospace", 10))
+                               fg=COLOR2, font=("monospace", 10))
         self.lbl_tx.pack(side="left")
         tk.Label(stats, text="(este equipo)", bg=BG, fg=MUTED,
                  font=F_SMALL).pack(side="right")
@@ -78,7 +79,7 @@ class SpeedPanel(tk.Toplevel):
         rx_col = tk.Frame(leg, bg=BG)
         rx_col.pack(side="left")
         self.lbl_rx_mbps = tk.Label(rx_col, text="— descarga  0.0 Mbps",
-                                     bg=BG, fg=GREEN, font=F_SMALL)
+                                     bg=BG, fg=COLOR1, font=F_SMALL)
         self.lbl_rx_mbps.pack(anchor="w")
         self.lbl_rx_peak = tk.Label(rx_col, text="  peak  0.0 Mbps",
                                      bg=BG, fg=MUTED, font=F_SMALL)
@@ -87,7 +88,7 @@ class SpeedPanel(tk.Toplevel):
         tx_col = tk.Frame(leg, bg=BG)
         tx_col.pack(side="left", padx=12)
         self.lbl_tx_mbps = tk.Label(tx_col, text="— subida  0.0 Mbps",
-                                     bg=BG, fg=CYAN, font=F_SMALL)
+                                     bg=BG, fg=COLOR2, font=F_SMALL)
         self.lbl_tx_mbps.pack(anchor="w")
         self.lbl_tx_peak = tk.Label(tx_col, text="  peak  0.0 Mbps",
                                      bg=BG, fg=MUTED, font=F_SMALL)
@@ -138,8 +139,8 @@ class SpeedPanel(tk.Toplevel):
             self.canvas.create_line(2, y, GRAPH_W - 2, y,
                                     fill=BORDER, width=1)
 
-        draw_line(rx_hist, GREEN)
-        draw_line(tx_hist, CYAN)
+        draw_line(rx_hist, COLOR1)
+        draw_line(tx_hist, COLOR2)
         self.canvas.create_text(GRAPH_W - 4, 4, text=fmt_kbs(max_val),
                                 fill=MUTED, font=F_SMALL, anchor="ne")
 

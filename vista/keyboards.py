@@ -4,17 +4,21 @@ view/keyboards.py — widgets de teclado virtual reutilizables
 import tkinter as tk
 from typing import Callable
 
-BG      = "#0f0f12"
-BG2     = "#161620"
-BORDER  = "#1e1e2a"
-ORANGE  = "#f0a030"
-CYAN    = "#7fd4c1"
-WHITE   = "#e0e0e8"
-MUTED   = "#4a4a5a"
+from vista.gui_dictionary import COLORS, FORMATS
 
-F_NORMAL = ("monospace", 9)
-F_SMALL  = ("monospace", 8)
 
+BG      = COLORS["BG"]
+BG2     = COLORS["BG2"]
+BORDER  = COLORS["BORDER"]
+COLOR1  = COLORS["ORANGE"]
+COLOR2    = COLORS["CYAN"]
+COLOR3   = COLORS["WHITE"]
+MUTED   = COLORS["MUTED"]
+
+
+
+F_NORMAL = FORMATS["F_NORMAL"]
+F_SMALL  = FORMATS["F_SMALL"]
 
 class VirtualKeyboard(tk.Frame):
     """Teclado QWERTY para texto libre."""
@@ -37,9 +41,9 @@ class VirtualKeyboard(tk.Frame):
             rf = tk.Frame(self, bg=BG)
             rf.pack()
             for ch in row:
-                tk.Button(rf, text=ch, width=3, bg=BG2, fg=WHITE,
+                tk.Button(rf, text=ch, width=3, bg=BG2, fg=COLOR3,
                           font=F_SMALL, relief="flat", bd=0,
-                          activebackground=BORDER, activeforeground=CYAN,
+                          activebackground=BORDER, activeforeground=COLOR2,
                           command=lambda c=ch: self._type(c)
                 ).pack(side="left", padx=1, pady=1)
 
@@ -49,10 +53,10 @@ class VirtualKeyboard(tk.Frame):
                                    font=F_SMALL, relief="flat", bd=0,
                                    command=self._toggle_case)
         self._btn_case.pack(side="left", padx=1)
-        tk.Button(sp, text="espacio", width=8, bg=BG2, fg=WHITE,
+        tk.Button(sp, text="espacio", width=8, bg=BG2, fg=COLOR3,
                   font=F_SMALL, relief="flat", bd=0,
                   command=lambda: self._type(" ")).pack(side="left", padx=1)
-        tk.Button(sp, text="⌫", width=4, bg=BG2, fg=ORANGE,
+        tk.Button(sp, text="⌫", width=4, bg=BG2, fg=COLOR1,
                   font=F_SMALL, relief="flat", bd=0,
                   command=self._backspace).pack(side="left", padx=1)
 
@@ -86,18 +90,18 @@ class Numpad(tk.Frame):
         rf1 = tk.Frame(self, bg=BG)
         rf1.pack()
         for ch in "1234567890":
-            tk.Button(rf1, text=ch, width=3, bg=BG2, fg=WHITE,
+            tk.Button(rf1, text=ch, width=3, bg=BG2, fg=COLOR3,
                       font=F_NORMAL, relief="flat", bd=0,
-                      activebackground=BORDER, activeforeground=CYAN,
+                      activebackground=BORDER, activeforeground=COLOR2,
                       command=lambda c=ch: self._type(c)
             ).pack(side="left", padx=1, pady=2)
 
         rf2 = tk.Frame(self, bg=BG)
         rf2.pack(pady=(2, 0))
         for ch, fg, w, cmd in [
-            (".", WHITE, 4, lambda: self._type(".")),
-            ("/", WHITE, 4, lambda: self._type("/")),
-            ("⌫", ORANGE, 4, self._backspace),
+            (".", COLOR3, 4, lambda: self._type(".")),
+            ("/", COLOR3, 4, lambda: self._type("/")),
+            ("⌫", COLOR1, 4, self._backspace),
             ("Limpiar", MUTED, 8, lambda: self._entry.delete(0, "end")),
         ]:
             tk.Button(rf2, text=ch, width=w, bg=BG2, fg=fg,

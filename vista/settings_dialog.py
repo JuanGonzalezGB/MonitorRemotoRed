@@ -6,16 +6,18 @@ import tkinter as tk
 from typing import Callable
 
 from vista.keyboards import Numpad, VirtualKeyboard
+from vista.gui_dictionary import COLORS, FORMATS
 
-BG      = "#0f0f12"
-BG2     = "#161620"
-BORDER  = "#1e1e2a"
-CYAN    = "#7fd4c1"
-WHITE   = "#e0e0e8"
-MUTED   = "#4a4a5a"
+BG      = COLORS["BG"]
+BG2     = COLORS["BG2"]
+BORDER  = COLORS["BORDER"]
+COLOR1    = COLORS["CYAN"]
+COLOR2   = COLORS["WHITE"]
+MUTED   = COLORS["MUTED"]
 
-F_NORMAL = ("monospace", 9)
-F_SMALL  = ("monospace", 8)
+F_NORMAL = FORMATS["F_NORMAL"]
+F_SMALL  = FORMATS["F_SMALL"]
+
 
 
 def _labeled_entry(parent, label: str, value: str, show: str = "") -> tk.Entry:
@@ -25,7 +27,7 @@ def _labeled_entry(parent, label: str, value: str, show: str = "") -> tk.Entry:
              font=F_SMALL, width=16, anchor="w").pack(side="left")
     ef = tk.Frame(row, bg=BORDER, padx=1, pady=1)
     ef.pack(side="left", fill="x", expand=True)
-    entry = tk.Entry(ef, bg=BG2, fg=WHITE, insertbackground=CYAN,
+    entry = tk.Entry(ef, bg=BG2, fg=COLOR2, insertbackground=COLOR1,
                      font=("monospace", 9), relief="flat", bd=2, show=show)
     entry.insert(0, value)
     entry.pack(fill="x")
@@ -49,7 +51,7 @@ class SettingsDialog(tk.Toplevel):
 
     def _build(self, subnet: str, interval: int, mongo: dict):
         # Título fijo arriba
-        tk.Label(self, text="Configuración", bg=BG, fg=CYAN,
+        tk.Label(self, text="Configuración", bg=BG, fg=COLOR1,
                  font=F_NORMAL).pack(pady=(8, 4))
         tk.Frame(self, bg=BORDER, height=1).pack(fill="x", padx=12)
 
@@ -59,7 +61,7 @@ class SettingsDialog(tk.Toplevel):
         tk.Button(bf, text="Cancelar", bg=BG2, fg=MUTED,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
-        tk.Button(bf, text="Guardar", bg="#0f2520", fg=CYAN,
+        tk.Button(bf, text="Guardar", bg="#0f2520", fg=COLOR1,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self._save).pack(side="left", padx=6)
 
@@ -92,7 +94,7 @@ class SettingsDialog(tk.Toplevel):
         canvas.bind_all("<MouseWheel>", _on_wheel)
 
         # ── Campos de red ─────────────────────────────────────────────────────
-        tk.Label(self._scroll_frame, text="Red", bg=BG, fg=CYAN,
+        tk.Label(self._scroll_frame, text="Red", bg=BG, fg=COLOR1,
                  font=F_SMALL).pack(anchor="w", pady=(4, 2))
 
         self.e_subnet   = _labeled_entry(self._scroll_frame, "Subred", subnet)
@@ -101,7 +103,7 @@ class SettingsDialog(tk.Toplevel):
         tk.Frame(self._scroll_frame, bg=BORDER, height=1).pack(fill="x", pady=(8, 2))
 
         # ── Campos MongoDB ────────────────────────────────────────────────────
-        tk.Label(self._scroll_frame, text="MongoDB", bg=BG, fg=CYAN,
+        tk.Label(self._scroll_frame, text="MongoDB", bg=BG, fg=COLOR1,
                  font=F_SMALL).pack(anchor="w", pady=(0, 2))
 
         self.e_host = _labeled_entry(self._scroll_frame, "Host", mongo.get("host", ""))
