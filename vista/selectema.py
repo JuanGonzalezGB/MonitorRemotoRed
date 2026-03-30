@@ -5,9 +5,6 @@ import tkinter as tk
 from vista.gui_dictionary import FORMATS, TEMAS
 from controlador.controladorTemas import ControladorTemas, etiquetar, ROL_BG, ROL_BG2, ROL_CYAN, ROL_MUTED, ROL_BOTON
 
-import sys
-import subprocess
-
 F_TITLE  = FORMATS["F_TITLE"]
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]
