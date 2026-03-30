@@ -1,17 +1,19 @@
-from estilo import dark, light, matrix, crimson
+from estilo import dark, light, matrix, crimson,teal
 
 TEMAS = {
     "Oscuro": "dark",
     "Claro": "light",
     "Matrix": "matrix",
-    "Blood": "crimson_dark"
+    "Blood" : "crimson_dark",
+    "Turquesa":"teal_dark"
 }
 
 CLASESTEMAS = {
     "dark": dark.DarkColor,
-    "light": light.LightColor,
     "matrix": matrix.MatrixColor,
-    "crimson_dark":crimson.CrimsonColor
+    "crimson_dark": crimson.CrimsonColor,
+    "teal_dark": teal.TealColor,
+    "light": light.LightColor
 }
 
 GRAPHFORMAT = {
