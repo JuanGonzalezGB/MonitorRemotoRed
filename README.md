@@ -37,3 +37,7 @@ Para instalar con pyinstaller desde Windows:
     pyinstaller --onedir --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --hidden-import nmap --name="Net Monitor Beta" main.py
 
 
+This project includes code generated with assistance of AI tools and manually reviewed and modified by the author.
+
+Este proyecto incluye código generado con asistencia de herramientas de IA, manualmente revisado y modificado por el autor.
+
