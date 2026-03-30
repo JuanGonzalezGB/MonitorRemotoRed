@@ -184,10 +184,14 @@ class ScannerController:
         self._scanning = True
         try:
             devices = run_scan(self._get_subnet())
-            self._on_result(devices)
+            self._emit(devices)
         finally:
             self._scanning = False
 
+    def _emit(self, devices):
+        if self._on_result:
+            self._on_result(devices)
+            
     def _loop(self):
         while self._running:
             self._do_scan()

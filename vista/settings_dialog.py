@@ -6,7 +6,7 @@ import tkinter as tk
 from typing import Callable
 
 from vista.keyboards import Numpad, VirtualKeyboard
-from vista.gui_dictionary import COLORS, FORMATS
+from vista.gui_dictionary import  FORMATS
 
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]

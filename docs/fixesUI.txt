@@ -1,0 +1,240 @@
+================================================================================
+REPORTE DE BUGS Y FIXES — Net Monitor
+Fecha: 29/03/2026
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+BUG #1 — Dispositivos offline no se marcaban en rojo
+────────────────────────────────────────────────────────────────────────────────
+
+ARCHIVO AFECTADO: main.py
+
+DESCRIPCIÓN:
+    Cuando un dispositivo desaparecía de la red, el punto y el ping debían
+    ponerse en rojo. Esto no ocurría. El Dashboard tenía el método refresh_ui()
+    correctamente implementado para detectar MACs ausentes y pintarlos de rojo,
+    pero nunca se llamaba.
+
+CAUSA RAÍZ:
+    En main.py, la función _refresh() iteraba manualmente solo los devices que
+    llegaban del scan, llamando update_device() uno por uno. Como update_device()
+    solo procesa un device a la vez, nunca sabía cuáles habían desaparecido.
+    refresh_ui() existía pero era letra muerta.
+
+CÓDIGO ROTO (main.py → función _refresh):
+
+    def _refresh(devices):
+        for d in devices:
+            app.update_device(d)   # solo itera los que llegaron, nunca detecta ausentes
+        app.update_counts(devices)
+        app.set_scanning(False)
+
+FIX (main.py → función _refresh):
+
+    def _refresh(devices):
+        app.refresh_ui(devices)    # detecta online Y offline en un solo paso
+        app.update_counts(devices)
+        app.set_scanning(False)
+
+POR QUÉ FUNCIONA:
+    refresh_ui() hace dos cosas: llama update_device() para cada device que
+    llegó, y luego recorre self.rows buscando MACs que ya estaban en pantalla
+    pero no están en la lista nueva. A esos los pinta de rojo.
+
+
+────────────────────────────────────────────────────────────────────────────────
+BUG #2 — Al aceptar un tema, el color de dot y ping volvía al tema anterior
+          con cada refresco del scan
+────────────────────────────────────────────────────────────────────────────────
+
+ARCHIVOS AFECTADOS: controlador/controladorTemas.py, vista/dashboard.py
+
+DESCRIPCIÓN:
+    Al aceptar un tema nuevo, todos los widgets se repintaban correctamente.
+    Pero en el siguiente ciclo de scan, el punto (dot) y el ping de cada
+    dispositivo volvían a los colores del tema anterior.
+
+CAUSA RAÍZ:
+    El Dashboard guarda el objeto de estilo en self.estilo al momento de
+    iniciarse. Cuando el usuario aceptaba el tema, aceptarTema() actualizaba
+    config.theme y repintaba los widgets recursivamente, pero self.estilo en el
+    Dashboard nunca se actualizaba. Entonces en el próximo scan, update_device()
+    leía self.estilo.green, self.estilo.red, self.estilo.orange — todos del tema
+    viejo — y pisaba el repintado que acababa de hacer el controlador de temas.
+
+CÓDIGO ROTO (controladorTemas.py → método aceptarTema):
+
+    def aceptarTema(self, tipo: str):
+        try:
+            self.root.master.config.theme = tipo
+        except Exception:
+            pass
+        self._aplicar_recursivo(self.root.master, EstiloFactory.definirEstilo(tipo))
+        # self.estilo del Dashboard nunca se actualiza → próximo scan usa colores viejos
+
+FIX (controladorTemas.py → método aceptarTema):
+
+    def aceptarTema(self, tipo: str):
+        estilo = EstiloFactory.definirEstilo(tipo)
+        try:
+            self.root.master.config.theme = tipo
+        except Exception:
+            pass
+        try:
+            self.root.master.apply_estilo(estilo)
+        except Exception:
+            pass
+        self._aplicar_recursivo(self.root.master, estilo)
+
+CÓDIGO NUEVO (vista/dashboard.py → método apply_estilo, agregado antes de _tick_clock):
+
+    def apply_estilo(self, estilo):
+        """Actualiza self.estilo para que los próximos scans y nuevos widgets usen el tema actual."""
+        self.estilo = estilo
+
+POR QUÉ FUNCIONA:
+    aceptarTema() construye el objeto estilo una sola vez, lo pasa a
+    apply_estilo() para que el Dashboard actualice su referencia interna, y
+    luego repinta los widgets con ese mismo objeto. Así, cuando llega el
+    próximo scan y update_device() accede a self.estilo.green / self.estilo.red,
+    ya apunta al tema correcto.
+
+
+────────────────────────────────────────────────────────────────────────────────
+BUG #3 — Durante preview de tema, dot y ping volvían al color anterior
+          con cada refresco del scan
+────────────────────────────────────────────────────────────────────────────────
+
+ARCHIVO AFECTADO: controlador/controladorTemas.py
+
+DESCRIPCIÓN:
+    Al hacer preview de un tema (sin aceptarlo todavía), los widgets se
+    repintaban correctamente. Pero si llegaba un scan mientras el selector
+    estaba abierto, dot y ping volvían a los colores del tema anterior.
+    Al aceptar el tema todo funcionaba bien — solo fallaba durante el preview.
+
+CAUSA RAÍZ:
+    El mismo problema del Bug #2 pero en aplicarTema() en lugar de aceptarTema().
+    El fix del Bug #2 solo había corregido aceptarTema(), dejando aplicarTema()
+    sin actualizar self.estilo en el Dashboard.
+
+CÓDIGO ROTO (controladorTemas.py → método aplicarTema):
+
+    def aplicarTema(self, tipo: str):
+        estilo = EstiloFactory.definirEstilo(tipo)
+        self._aplicar_recursivo(self.root.master, estilo)
+        self._aplicar_recursivo(self.root, estilo)
+        # self.estilo del Dashboard nunca se actualiza → próximo scan usa colores viejos
+
+FIX (controladorTemas.py → método aplicarTema):
+
+    def aplicarTema(self, tipo: str):
+        estilo = EstiloFactory.definirEstilo(tipo)
+        try:
+            self.root.master.apply_estilo(estilo)
+        except Exception:
+            pass
+        self._aplicar_recursivo(self.root.master, estilo)
+        self._aplicar_recursivo(self.root, estilo)
+
+POR QUÉ FUNCIONA:
+    Mismo principio que el Bug #2 — apply_estilo() sincroniza self.estilo en el
+    Dashboard antes de repintar, así el próximo scan usa los colores del tema
+    en preview y no los del tema anterior.
+
+
+────────────────────────────────────────────────────────────────────────────────
+BUG #4 — Al cancelar el selector de temas, los colores quedaban mezclados
+          y los widgets nuevos aparecían con el tema original durante el preview
+────────────────────────────────────────────────────────────────────────────────
+
+ARCHIVOS AFECTADOS: vista/selectema.py, vista/dashboard.py
+
+DESCRIPCIÓN:
+    Dos problemas relacionados que ocurrían durante el preview:
+
+    a) Al cerrar el selector con Cancelar o ✕ sin aceptar, el dashboard
+       quedaba con el tema del preview activo en lugar de volver al original.
+
+    b) Si durante el preview llegaba un scan con dispositivos nuevos (que no
+       estaban en pantalla antes), los widgets nuevos se creaban con los colores
+       del tema original guardado en config, no con los del tema en preview,
+       generando una mezcla visual.
+
+CAUSA RAÍZ (a) — Cancelar no revertía:
+    El botón Cancelar y la ✕ llamaban directamente self.destroy() sin revertir
+    el preview. No había ningún mecanismo para recordar cuál era el tema
+    original al abrir el selector.
+
+CAUSA RAÍZ (b) — _make_row usaba config.theme:
+    _make_row() en el Dashboard llamaba EstiloFactory.definirEstilo(self.config.theme)
+    para crear los widgets de una fila nueva. config.theme es el tema guardado
+    en disco — no se actualiza durante el preview — así que los widgets nuevos
+    siempre se creaban con el tema original ignorando el preview activo.
+
+CÓDIGO ROTO (vista/selectema.py → __init__ y botones):
+
+    def __init__(self, parent, estilo):
+        ...
+        # No se guarda el tema original
+
+    btn_x = tk.Button(..., command=self.destroy)       # no revierte
+    btn_cancel = tk.Button(..., command=self.destroy)  # no revierte
+
+FIX (vista/selectema.py → __init__ y nuevo método _cancel):
+
+    def __init__(self, parent, estilo):
+        ...
+        self._tema_original = estilo.getNombre()  # guardar tema al abrir
+
+    btn_x = tk.Button(..., command=self._cancel)      # ahora revierte
+    btn_cancel = tk.Button(..., command=self._cancel) # ahora revierte
+
+    def _cancel(self):
+        self.controladorTema.aplicarTema(self._tema_original)  # revertir preview
+        self.destroy()
+
+CÓDIGO ROTO (vista/dashboard.py → método _make_row):
+
+    def _make_row(self, mac: str):
+        estilo = EstiloFactory.definirEstilo(self.config.theme)  # ignora el preview
+        ...
+
+FIX (vista/dashboard.py → método _make_row):
+
+    def _make_row(self, mac: str):
+        estilo = self.estilo  # usa el tema activo, incluyendo durante preview
+        ...
+
+POR QUÉ FUNCIONA:
+    Al cancelar, _cancel() llama aplicarTema() con el tema original antes de
+    destruir la ventana, revirtiendo todo el repintado del preview incluyendo
+    self.estilo del Dashboard (gracias al fix del Bug #3).
+    Al crear filas nuevas, _make_row() usa self.estilo que siempre refleja el
+    tema activo en ese momento, sea el original, un preview, o uno aceptado.
+
+
+================================================================================
+RESUMEN DE CAMBIOS
+================================================================================
+
+    main.py
+        _refresh()                  reemplazar loop manual por app.refresh_ui()
+
+    controlador/controladorTemas.py
+        aplicarTema()               agregar llamada a apply_estilo() antes de repintar
+        aceptarTema()               refactorizar para construir estilo una sola vez
+                                    y llamar apply_estilo() antes de repintar
+
+    vista/dashboard.py
+        _make_row()                 cambiar EstiloFactory.definirEstilo(self.config.theme)
+                                    por self.estilo
+        apply_estilo()              método nuevo, agregado antes de _tick_clock()
+
+    vista/selectema.py
+        __init__()                  guardar self._tema_original = estilo.getNombre()
+        btn_x / btn_cancel          apuntar a _cancel() en lugar de destroy()
+        _cancel()                   método nuevo que revierte preview antes de cerrar
+
+================================================================================

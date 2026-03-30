@@ -38,8 +38,7 @@ def main():
         app.after(0, lambda d=devices: _refresh(d))
 
     def _refresh(devices):
-        for d in devices:
-            app.update_device(d)
+        app.refresh_ui(devices)      # ← detecta online Y offline
         app.update_counts(devices)
         app.set_scanning(False)
 

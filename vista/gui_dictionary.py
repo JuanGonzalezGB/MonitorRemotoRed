@@ -1,29 +1,16 @@
-from estilo import dark, light
+from estilo import dark, light, matrix
 
 TEMAS = {
     "Oscuro": "dark",
     "Claro": "light",
+    "Matrix": "matrix"
 }
 
 CLASESTEMAS = {
     "dark": dark.DarkColor,
     "light": light.LightColor,
+    "matrix": matrix.MatrixColor
 }
-
-
-COLORS = {
-    "BG"      : "#0f0f12",
-    "BG2"     : "#161620",
-    "BORDER"  : "#1e1e2a",
-    "GREEN"   : "#3ddc84",
-    "ORANGE"  : "#f0a030",
-    "RED"     : "#e05252",
-    "CYAN"    : "#7fd4c1",
-    "BLUE"    : "#7a9fd4",
-    "MUTED"   : "#4a4a5a",
-    "WHITE"   : "#e0e0e8"
-}
-
 
 GRAPHFORMAT = {
     "GRAPH_W" : 440,
@@ -40,3 +27,26 @@ FORMATS = {
     "COL_PING"   :  6
 }
 
+ROLES = {
+    "BG"     : "bg",
+    "BG2"    : "bg2",
+    "CYAN"   : "cyan",
+    "MUTED"  : "muted",
+    "GREEN"  : "green",
+    "ORANGE" : "orange",
+    "RED"    : "red",
+    "BLUE"   : "blue",
+    "WHITE"  : "white",
+    "BOTON"  : "boton",
+}
+
+ROL_BG     = "bg"
+ROL_BG2    = "bg2"
+ROL_CYAN   = "cyan"
+ROL_MUTED  = "muted"
+ROL_GREEN  = "green"
+ROL_ORANGE = "orange"
+ROL_RED    = "red"
+ROL_BLUE   = "blue"
+ROL_WHITE  = "white"
+ROL_BOTON  = "boton"

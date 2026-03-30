@@ -3,7 +3,7 @@ view/speed_panel.py — panel flotante de velocidad del host
 """
 import tkinter as tk
 from modelo.bandwidth import BandwidthMonitor
-from vista.gui_dictionary import COLORS, FORMATS, GRAPHFORMAT
+from vista.gui_dictionary import FORMATS, GRAPHFORMAT
 
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]

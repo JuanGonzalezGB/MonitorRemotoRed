@@ -4,7 +4,7 @@ view/keyboards.py — widgets de teclado virtual reutilizables
 import tkinter as tk
 from typing import Callable
 
-from vista.gui_dictionary import COLORS, FORMATS
+from vista.gui_dictionary import  FORMATS
 
 
 
@@ -84,7 +84,7 @@ class Numpad(tk.Frame):
         rf1 = tk.Frame(self, bg=self.estilo.bg)
         rf1.pack()
         for ch in "1234567890":
-            tk.Button(rf1, text=ch, width=3, bg=self.estilo.bg2, fg=self.estilo.white,
+            tk.Button(rf1, text=ch, width=2, bg=self.estilo.bg2, fg=self.estilo.white,
                       font=F_NORMAL, relief="flat", bd=0,
                       activebackground=self.estilo.border, activeforeground=self.estilo.cyan,
                       command=lambda c=ch: self._type(c)
