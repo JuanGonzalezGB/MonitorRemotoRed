@@ -19,7 +19,7 @@ def main():
 
     estilo = estiloFactory.EstiloFactory.definirEstilo(tema)
 
-    config = Config()
+    #config = Config()
     cache  = StateCache()
     bw     = BandwidthMonitor()
 
