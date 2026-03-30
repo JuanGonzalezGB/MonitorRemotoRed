@@ -19,8 +19,8 @@ class VirtualKeyboard(tk.Frame):
     ]
 
     def __init__(self, estilo, parent, entry: tk.Entry, **kwargs):
-        super().__init__(parent, bg=estilo.bg, **kwargs)
         self.estilo = estilo
+        super().__init__(parent,bg=self.estilo.bg,  **kwargs)
         self._entry = entry
         self._uppercase = False
         self._char_kb = None
@@ -114,8 +114,8 @@ class CharKeyboard(tk.Frame):
 
     def __init__(self, estilo, parent, entry: tk.Entry,
                  on_back=None, **kwargs):
-        super().__init__(parent, bg=estilo.bg, **kwargs)
         self.estilo = estilo
+        super().__init__(parent, bg=self.estilo.bg, **kwargs)
         self._entry = entry
         self._on_back = on_back
         self._build()

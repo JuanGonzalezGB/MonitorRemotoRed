@@ -13,9 +13,9 @@ F_SMALL  = FORMATS["F_SMALL"]
 
 class RenameDialog(tk.Toplevel):
     def __init__(self, parent, mac: str, ip: str,
-                 current_name: str, on_save: Callable[[str, str], None],estilo):
+                 current_name: str, on_save: Callable[[str, str], None], estilo):
         super().__init__(parent)
-        self.estilo=estilo
+        self.estilo = estilo
         self.on_save = on_save
         self.mac = mac
         self.ip = ip
@@ -26,28 +26,31 @@ class RenameDialog(tk.Toplevel):
         self.grab_set()
 
     def _build(self, current_name: str):
-        tk.Label(self, text=f"Renombrar  {self.ip}  ({self.mac})",
-                 bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL).pack(pady=(12, 4))
-
-        ef = tk.Frame(self, bg=self.estilo.border, padx=1, pady=1)
-        ef.pack(padx=24, fill="x")
-        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white, insertbackground=self.estilo.cyan,
-                              font=("monospace", 12), relief="flat", bd=4)
-        self.entry.insert(0, current_name)
-        self.entry.pack(fill="x")
-        self.entry.focus_set()
-        self.entry.icursor("end")
-
-        VirtualKeyboard(self, self.estilo, self.entry).pack(pady=(8, 0), padx=8)
-
+        # ── Footer fijo abajo ──────────────────────────────────────────────
         bf = tk.Frame(self, bg=self.estilo.bg)
-        bf.pack(pady=(8, 0))
+        bf.pack(side="bottom", pady=(4, 10))
         tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self.destroy).pack(side="left", padx=6)
         tk.Button(bf, text="Guardar", bg="#0f2520", fg=self.estilo.cyan,
                   font=F_SMALL, relief="flat", bd=0, padx=12,
                   command=self._save).pack(side="left", padx=6)
+
+        # ── Contenido ──────────────────────────────────────────────────────
+        tk.Label(self, text=f"Renombrar  {self.ip}  ({self.mac})",
+                 bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL).pack(pady=(12, 4))
+
+        ef = tk.Frame(self, bg=self.estilo.border, padx=1, pady=1)
+        ef.pack(padx=24, fill="x")
+        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white,
+                              insertbackground=self.estilo.cyan,
+                              font=("monospace", 12), relief="flat", bd=4)
+        self.entry.insert(0, current_name)
+        self.entry.pack(fill="x")
+        self.entry.focus_set()
+        self.entry.icursor("end")
+
+        VirtualKeyboard(self.estilo, self, self.entry).pack(pady=(8, 0), padx=8)
 
         self.entry.bind("<Return>", lambda e: self._save())
         self.entry.bind("<Escape>", lambda e: self.destroy())
@@ -61,8 +64,9 @@ class RenameDialog(tk.Toplevel):
 
 class NumpadDialog(tk.Toplevel):
     def __init__(self, parent, title: str, value: str,
-                 on_save: Callable[[str], None]):
+                 on_save: Callable[[str], None], estilo):  # ← estilo agregado
         super().__init__(parent)
+        self.estilo = estilo                               # ← asignado antes de _build
         self.on_save = on_save
         self.overrideredirect(True)
         self.configure(bg=self.estilo.bg)
@@ -71,12 +75,24 @@ class NumpadDialog(tk.Toplevel):
         self.grab_set()
 
     def _build(self, title: str, value: str):
+        # ── Footer fijo abajo ──────────────────────────────────────────────
+        bf = tk.Frame(self, bg=self.estilo.bg)
+        bf.pack(side="bottom", pady=(4, 10))
+        tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
+                  font=F_SMALL, relief="flat", bd=0, padx=12,
+                  command=self.destroy).pack(side="left", padx=6)
+        tk.Button(bf, text="Guardar", bg="#0f2520", fg=self.estilo.cyan,
+                  font=F_SMALL, relief="flat", bd=0, padx=12,
+                  command=self._save).pack(side="left", padx=6)
+
+        # ── Contenido ──────────────────────────────────────────────────────
         tk.Label(self, text=title, bg=self.estilo.bg, fg=self.estilo.cyan,
                  font=F_SMALL).pack(pady=(8, 4))
 
         ef = tk.Frame(self, bg=self.estilo.border, padx=1, pady=1)
         ef.pack(padx=60, fill="x")
-        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white, insertbackground=self.estilo.cyan,
+        self.entry = tk.Entry(ef, bg=self.estilo.bg2, fg=self.estilo.white,
+                              insertbackground=self.estilo.cyan,
                               font=("monospace", 11), relief="flat", bd=3,
                               justify="center")
         self.entry.insert(0, value)
@@ -84,16 +100,7 @@ class NumpadDialog(tk.Toplevel):
         self.entry.focus_set()
         self.entry.icursor("end")
 
-        Numpad(self, self.entry).pack(pady=(8, 0))
-
-        bf = tk.Frame(self, bg=self.estilo.bg)
-        bf.pack(pady=(10, 0))
-        tk.Button(bf, text="Cancelar", bg=self.estilo.bg2, fg=self.estilo.muted,
-                  font=F_SMALL, relief="flat", bd=0, padx=12,
-                  command=self.destroy).pack(side="left", padx=6)
-        tk.Button(bf, text="Guardar", bg="#0f2520", fg=self.estilo.cyan,
-                  font=F_SMALL, relief="flat", bd=0, padx=12,
-                  command=self._save).pack(side="left", padx=6)
+        Numpad(self.estilo, self, self.entry).pack(pady=(8, 0))  # ← estilo agregado
 
         self.entry.bind("<Return>", lambda e: self._save())
         self.entry.bind("<Escape>", lambda e: self.destroy())
