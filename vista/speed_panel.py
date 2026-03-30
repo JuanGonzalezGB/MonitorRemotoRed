@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Juan S.G. Castellanos
 """
 view/speed_panel.py — panel flotante de velocidad del host
 """
