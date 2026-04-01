@@ -21,9 +21,10 @@ class RenameDialog(tk.Toplevel):
         self.ip = ip
         self.overrideredirect(True)
         self.configure(bg=self.estilo.bg)
-        self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
+        self.geometry(f"480x250+{parent.winfo_x()}+{parent.winfo_y()}")
         self._build(current_name)
-        self.grab_set()
+        self.after(10, self.grab_set)
+        #self.grab_set()
 
     def _build(self, current_name: str):
         # ── Footer fijo abajo ──────────────────────────────────────────────
@@ -70,7 +71,7 @@ class NumpadDialog(tk.Toplevel):
         self.on_save = on_save
         self.overrideredirect(True)
         self.configure(bg=self.estilo.bg)
-        self.geometry(f"480x300+{parent.winfo_x()}+{parent.winfo_y()}")
+        self.geometry(f"480x250+{parent.winfo_x()}+{parent.winfo_y()}")
         self._build(title, value)
         self.grab_set()
 
