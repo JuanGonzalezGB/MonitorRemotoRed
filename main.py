@@ -12,13 +12,11 @@ from controlador.network import preflight
 import controlador.repository as repo
 from vista.dashboard import Dashboard
 from estilo.estiloFactory import EstiloFactory
-from rpicore.config import REFRESH_MS
 
 _ENV_PATH = "/home/gurthbrannon/rasphole/Source/rpi-core/.env"
 
 
 def _update_env_interval(seconds: int) -> None:
-    """Reemplaza SCAN_INTERVAL_S en el .env sin tocar el resto."""
     try:
         with open(_ENV_PATH, "r") as f:
             content = f.read()
@@ -36,7 +34,6 @@ def _update_env_interval(seconds: int) -> None:
 
 
 def _restart_collector() -> None:
-    """Reinicia el servicio para que lea el nuevo intervalo."""
     try:
         subprocess.run(
             ["sudo", "systemctl", "restart", "network-collector"],
@@ -59,9 +56,10 @@ def main():
         config.set_device_name(mac, name)
 
     def on_settings_change(subnet: str, interval: int, mongo: dict):
-        config.subnet = subnet
-        config.mongo  = mongo
-        _update_env_interval(interval)
+        config.subnet    = subnet
+        config.scan_interval = interval  # guarda en config.json
+        config.mongo     = mongo
+        _update_env_interval(interval)   # guarda en .env del servicio
         _restart_collector()
 
     app = Dashboard(
@@ -81,10 +79,10 @@ def main():
         except Exception as e:
             app.lbl_last.config(text=f"error: {e}")
         finally:
-            app.after(REFRESH_MS, poll_mongo)
+            app.after(config.scan_interval * 1000, poll_mongo)
 
     bw.start()
-    app.after(REFRESH_MS, poll_mongo)
+    app.after(config.scan_interval * 1000, poll_mongo)
     app.mainloop()
     bw.stop()
 
