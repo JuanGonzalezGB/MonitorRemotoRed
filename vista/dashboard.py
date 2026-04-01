@@ -56,46 +56,47 @@ class Dashboard(tk.Tk):
         self._tick_clock()
 
     def _build_ui(self):
+        # ── Header ────────────────────────────────────────────────────────────
         self.hdr = tk.Frame(self, bg=self.estilo.bg)
         etiquetar(self.hdr, ROL_BG)
         self.hdr.pack(fill="x", padx=8, pady=(6, 0))
 
         self.lbl_title = tk.Label(self.hdr, text="NET MONITOR",
-                                  bg=self.estilo.bg, fg=self.estilo.cyan, font=F_TITLE)
+                                bg=self.estilo.bg, fg=self.estilo.cyan, font=F_TITLE)
         etiquetar(self.lbl_title, ROL_BG, ROL_CYAN)
         self.lbl_title.pack(side="left")
 
         self.btn_settings = tk.Button(self.hdr, text="⚙",
-                  bg=self.estilo.bg, fg=self.estilo.muted,
-                  font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
-                  activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
-                  command=self._open_settings)
+                bg=self.estilo.bg, fg=self.estilo.muted,
+                font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
+                activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
+                command=self._open_settings)
         etiquetar(self.btn_settings, ROL_BG, ROL_MUTED)
         self.btn_settings.pack(side="left", padx=(6, 0))
 
         self.btn_speed = tk.Button(self.hdr, text="↑↓",
-                  bg=self.estilo.bg, fg=self.estilo.muted,
-                  font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
-                  activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
-                  command=self._open_host_speed)
+                bg=self.estilo.bg, fg=self.estilo.muted,
+                font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
+                activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
+                command=self._open_host_speed)
         etiquetar(self.btn_speed, ROL_BG, ROL_MUTED)
         self.btn_speed.pack(side="left", padx=(4, 0))
 
         self.btn_theme = tk.Button(self.hdr, text="🎨",
-                  bg=self.estilo.bg, fg=self.estilo.muted,
-                  font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
-                  activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
-                  command=self._open_theme)
+                bg=self.estilo.bg, fg=self.estilo.muted,
+                font=("monospace", 11), relief="flat", bd=0, cursor="hand2",
+                activebackground=self.estilo.bg, activeforeground=self.estilo.cyan,
+                command=self._open_theme)
         etiquetar(self.btn_theme, ROL_BG, ROL_MUTED)
         self.btn_theme.pack(side="left", padx=(4, 0))
 
         self.lbl_time = tk.Label(self.hdr, text="",
-                                 bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
+                                bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         etiquetar(self.lbl_time, ROL_BG, ROL_MUTED)
         self.lbl_time.pack(side="right")
 
         self.lbl_counts = tk.Label(self.hdr, text="escaneando...",
-                                   bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
+                                bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         etiquetar(self.lbl_counts, ROL_BG, ROL_MUTED)
         self.lbl_counts.pack(side="right", padx=12)
 
@@ -112,7 +113,7 @@ class Dashboard(tk.Tk):
             ("ping", COL_PING, "e")
         ]:
             lbl = tk.Label(col_hdr, text=txt, bg=self.estilo.bg, fg=self.estilo.muted,
-                           font=F_SMALL, width=w, anchor=anchor)
+                        font=F_SMALL, width=w, anchor=anchor)
             etiquetar(lbl, ROL_BG, ROL_MUTED)
             lbl.pack(side="left", padx=1)
 
@@ -120,36 +121,38 @@ class Dashboard(tk.Tk):
         sep2._bg_rol = "border"
         sep2.pack(fill="x", padx=8, pady=(1, 0))
 
+        # ── Footer — pack side=bottom ANTES del canvas ─────────────────────
         sep3 = tk.Frame(self, bg=self.estilo.border, height=1)
         sep3._bg_rol = "border"
-        sep3.pack(fill="x", padx=8, pady=(0, 2))
+        sep3.pack(side="bottom", fill="x", padx=8, pady=(0, 2))
 
         ftr = tk.Frame(self, bg=self.estilo.bg)
         etiquetar(ftr, ROL_BG)
-        ftr.pack(fill="x", padx=8, pady=(0, 4))
+        ftr.pack(side="bottom", fill="x", padx=8, pady=(0, 4))
 
         self.lbl_last = tk.Label(ftr, text="Esperando scan...",
-                                 bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
+                                bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         etiquetar(self.lbl_last, ROL_BG, ROL_MUTED)
         self.lbl_last.pack(side="left")
 
         self.lbl_subnet = tk.Label(ftr, text=self.config.subnet,
-                                   bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
+                                bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
         etiquetar(self.lbl_subnet, ROL_BG, ROL_MUTED)
         self.lbl_subnet.pack(side="left", padx=8)
 
         self.btn_scan = tk.Button(ftr, text="Scan",
-                                  bg=self.estilo.boton, fg=self.estilo.cyan,
-                                  font=F_SMALL, relief="flat", bd=0, padx=6,
-                                  command=self.on_force_scan)
+                                bg=self.estilo.boton, fg=self.estilo.cyan,
+                                font=F_SMALL, relief="flat", bd=0, padx=6,
+                                command=self.on_force_scan)
         etiquetar(self.btn_scan, ROL_BOTON, ROL_CYAN)
         self.btn_scan.pack(side="right")
 
+        # ── Canvas con scroll — pack DESPUÉS del footer ────────────────────
         _canvas = tk.Canvas(self, bg=self.estilo.bg, highlightthickness=0)
         etiquetar(_canvas, ROL_BG)
         _sb = tk.Scrollbar(self, orient="vertical", command=_canvas.yview)
         _canvas.configure(yscrollcommand=_sb.set)
-        _sb.pack(side="right", fill="y", pady=(0, 2))
+        _sb.pack(side="right", fill="y")
         _canvas.pack(fill="both", expand=True, padx=(8, 0))
         self.list_frame = tk.Frame(_canvas, bg=self.estilo.bg)
         etiquetar(self.list_frame, ROL_BG)
@@ -159,7 +162,6 @@ class Dashboard(tk.Tk):
             lambda e: _canvas.configure(scrollregion=_canvas.bbox("all"))
         )
         _canvas.bind("<Configure>", lambda e: _canvas.itemconfig(_win, width=e.width))
-        # scroll táctil
         _canvas.bind("<Button-4>", lambda e: _canvas.yview_scroll(-1, "units"))
         _canvas.bind("<Button-5>", lambda e: _canvas.yview_scroll(1, "units"))
         _canvas.bind("<ButtonPress-1>", lambda e: setattr(_canvas, "_drag_y", e.y))
