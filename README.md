@@ -4,17 +4,27 @@ El monitor de red lee los dispositivos detectados por el servicio `network-colle
 
 ---
 
-## Requisitos
+## Dependencias
 
-### Dependencias Python
+### Python
 
 ```bash
 pip3 install -r reqlinux.txt
 ```
 
+### rpi-core
+
+Este programa forma parte de un ecosistema de aplicaciones que comparten la librería `rpi-core`. Dicha librería provee utilidades comunes (widgets, estilos, acceso a base de datos, configuración compartida) y es instalada como dependencia editable:
+
+```bash
+pip install -e /ruta/a/rpi-core
+```
+
+`rpi-core` también contiene el archivo `.env` con la configuración compartida del ecosistema, incluyendo la conexión a MongoDB y el intervalo de scan del servicio. Asegúrese de que este archivo exista y esté correctamente configurado antes de ejecutar el programa.
+
 ### Servicio network-collector
 
-Esta rama requiere que el servicio `network-collector` esté corriendo en el sistema. El servicio usa `arp-scan` para detectar dispositivos en la red y persiste los resultados en MongoDB.
+Esta rama requiere que el servicio `network-collector` esté corriendo en el sistema. Es el encargado de escanear la red periódicamente usando `arp-scan` y persistir los resultados en MongoDB. La GUI depende de él para tener datos — sin el servicio activo, la lista de dispositivos aparecerá vacía.
 
 ```bash
 sudo apt install arp-scan
@@ -52,7 +62,7 @@ Puede configurar la IP, credenciales y nombre de la base de datos desde la confi
 
 ## Intervalo de scan
 
-El intervalo de scan se controla desde la configuración del programa. Al cambiar este valor se actualiza automáticamente el `.env` del servicio y se reinicia `network-collector` para aplicar el nuevo intervalo.
+El intervalo de scan se controla desde la configuración del programa. Al cambiar este valor se actualiza automáticamente `SCAN_INTERVAL_S` en el `.env` de `rpi-core` y se reinicia `network-collector` para aplicar el nuevo intervalo.
 
 Para que el reinicio del servicio funcione sin contraseña, agregue esta regla:
 
@@ -63,6 +73,8 @@ sudo visudo -f /etc/sudoers.d/network-collector
 ```
 tuusuario ALL=(ALL) NOPASSWD: /bin/systemctl restart network-collector
 ```
+
+> **Nota:** La ruta al `.env` de `rpi-core` está definida en `main.py` como `_ENV_PATH`. Si instala el programa en un sistema distinto, asegúrese de actualizar esta ruta antes de ejecutar o compilar.
 
 ---
 
@@ -77,6 +89,8 @@ tuusuario ALL=(ALL) NOPASSWD: /bin/systemctl restart network-collector
 
 ## Compilar con PyInstaller
 
+> **Atención:** Antes de compilar, verifique que `_ENV_PATH` en `main.py` apunta a la ubicación correcta del `.env` de `rpi-core` en el sistema destino.
+
 ```bash
 pyinstaller --onedir \
   --hidden-import pymongo \
@@ -86,6 +100,18 @@ pyinstaller --onedir \
   --hidden-import bson.codec_options \
   --name="Net Monitor" main.py
 ```
+
+---
+
+## Ecosistema
+
+Este programa es parte de un conjunto de aplicaciones construidas sobre `rpi-core`:
+
+- **network-collector** — servicio que escanea la red y persiste dispositivos en MongoDB.
+- **network-monitor** — esta aplicación. Visualiza los dispositivos detectados por el servicio.
+- **pihole-monitor** — monitorea estadísticas de Pi-hole. Lee `scanner.dispositivos` para mostrar nombres de dispositivos.
+
+La intención es que todas las apps del ecosistema migren progresivamente a usar las librerías y widgets de `rpi-core` como base común.
 
 ---
 
