@@ -3,7 +3,7 @@ controlador/repository.py
 Lee scanner.scans (escrito exclusivamente por el servicio collector).
 No escribe nada — dueño de scans es el collector.
 """
-from datetime import datetime, timezone
+from datetime import datetime
 from modelo.device import Device
 from pymongo import MongoClient
 
@@ -29,7 +29,7 @@ def get_devices(mongo_cfg: dict) -> list[Device]:
     """Lee scanner.scans y devuelve la lista de Device con estado online/offline."""
     try:
         col = _get_scans_col(mongo_cfg)
-        now = datetime.now(timezone.utc)
+        now = datetime.utcnow()
         devices = []
         for doc in col.find({}, {"_id": 0}):
             mac = doc.get("mac", "").lower()
