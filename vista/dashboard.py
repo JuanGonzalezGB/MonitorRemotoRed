@@ -120,29 +120,6 @@ class Dashboard(tk.Tk):
         sep2._bg_rol = "border"
         sep2.pack(fill="x", padx=8, pady=(1, 0))
 
-        _canvas = tk.Canvas(self, bg=self.estilo.bg, highlightthickness=0)
-        etiquetar(_canvas, ROL_BG)
-        _sb = tk.Scrollbar(self, orient="vertical", command=_canvas.yview)
-        _canvas.configure(yscrollcommand=_sb.set)
-        _sb.pack(side="right", fill="y", pady=(0, 2))
-        _canvas.pack(fill="both", expand=True, padx=(8, 0))
-        self.list_frame = tk.Frame(_canvas, bg=self.estilo.bg)
-        etiquetar(self.list_frame, ROL_BG)
-        _win = _canvas.create_window((0, 0), window=self.list_frame, anchor="nw")
-        self.list_frame.bind(
-            "<Configure>",
-            lambda e: _canvas.configure(scrollregion=_canvas.bbox("all"))
-        )
-        _canvas.bind("<Configure>", lambda e: _canvas.itemconfig(_win, width=e.width))
-        # scroll táctil
-        _canvas.bind("<Button-4>", lambda e: _canvas.yview_scroll(-1, "units"))
-        _canvas.bind("<Button-5>", lambda e: _canvas.yview_scroll(1, "units"))
-        _canvas.bind("<ButtonPress-1>", lambda e: setattr(_canvas, "_drag_y", e.y))
-        _canvas.bind("<B1-Motion>", lambda e: (
-            _canvas.yview_scroll(int((_canvas._drag_y - e.y) / 2), "units"),
-            setattr(_canvas, "_drag_y", e.y)
-        ))
-
         sep3 = tk.Frame(self, bg=self.estilo.border, height=1)
         sep3._bg_rol = "border"
         sep3.pack(fill="x", padx=8, pady=(0, 2))
@@ -167,6 +144,29 @@ class Dashboard(tk.Tk):
                                   command=self.on_force_scan)
         etiquetar(self.btn_scan, ROL_BOTON, ROL_CYAN)
         self.btn_scan.pack(side="right")
+
+        _canvas = tk.Canvas(self, bg=self.estilo.bg, highlightthickness=0)
+        etiquetar(_canvas, ROL_BG)
+        _sb = tk.Scrollbar(self, orient="vertical", command=_canvas.yview)
+        _canvas.configure(yscrollcommand=_sb.set)
+        _sb.pack(side="right", fill="y", pady=(0, 2))
+        _canvas.pack(fill="both", expand=True, padx=(8, 0))
+        self.list_frame = tk.Frame(_canvas, bg=self.estilo.bg)
+        etiquetar(self.list_frame, ROL_BG)
+        _win = _canvas.create_window((0, 0), window=self.list_frame, anchor="nw")
+        self.list_frame.bind(
+            "<Configure>",
+            lambda e: _canvas.configure(scrollregion=_canvas.bbox("all"))
+        )
+        _canvas.bind("<Configure>", lambda e: _canvas.itemconfig(_win, width=e.width))
+        # scroll táctil
+        _canvas.bind("<Button-4>", lambda e: _canvas.yview_scroll(-1, "units"))
+        _canvas.bind("<Button-5>", lambda e: _canvas.yview_scroll(1, "units"))
+        _canvas.bind("<ButtonPress-1>", lambda e: setattr(_canvas, "_drag_y", e.y))
+        _canvas.bind("<B1-Motion>", lambda e: (
+            _canvas.yview_scroll(int((_canvas._drag_y - e.y) / 2), "units"),
+            setattr(_canvas, "_drag_y", e.y)
+        ))
 
     def refresh_ui(self, devices: list[Device]):
         incoming = {d.mac: d for d in devices}
