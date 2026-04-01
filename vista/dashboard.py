@@ -30,7 +30,8 @@ class Dashboard(tk.Tk):
     def __init__(self, estilo, config: Config, bw: BandwidthMonitor,
                  on_force_scan: Callable,
                  on_settings_change: Callable[[str, int, dict], None],
-                 on_rename: Callable[[str, str], None]):
+                 on_rename: Callable[[str, str], None],
+                 on_delete: Callable[[str], None]):
         super().__init__()
         self.estilo = estilo
         self.config = config
@@ -38,6 +39,7 @@ class Dashboard(tk.Tk):
         self.on_force_scan = on_force_scan
         self.on_settings_change = on_settings_change
         self.on_rename = on_rename
+        self.on_delete = on_delete
 
         self.rows: dict[str, dict] = {}
         self._show_mac: dict[str, bool] = {}
@@ -212,7 +214,7 @@ class Dashboard(tk.Tk):
         row = self.rows[mac]
         row["ip"] = device.ip
 
-        label = self.config.device_name(mac) or device.ip.split(".")[-1]
+        label = self.config.device_name(mac) or mac
         row["name"].config(text=label[:COL_NAME])
         row["vendor"].config(text=device.vendor[:COL_VENDOR])
 
@@ -273,9 +275,18 @@ class Dashboard(tk.Tk):
             row["lbl_ip"]._fg_rol = "blue"
 
     def _open_rename(self, mac: str):
-        ip = self.rows[mac]["ip"]
+        ip      = self.rows[mac]["ip"]
         current = self.config.device_name(mac) or mac
-        RenameDialog(self, mac, ip, current, self._handle_rename, EstiloFactory.definirEstilo(self.config.theme))
+        RenameDialog(
+            self, mac, ip, current,
+            on_save=self._handle_rename,
+            on_delete=self._handle_delete,
+            estilo=EstiloFactory.definirEstilo(self.config.theme),
+        )
+    def _handle_delete(self, mac: str):
+        self.on_delete(mac)
+        if mac in self.rows:
+            self.rows[mac]["name"].config(text=mac[:COL_NAME])
 
     def _handle_rename(self, mac: str, name: str):
         self.on_rename(mac, name)

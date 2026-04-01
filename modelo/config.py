@@ -240,3 +240,21 @@ class Config:
     def theme(self, value: str):
         self._data["theme"] = value
         self._save_json()
+    
+    def delete_device(self, mac: str):
+        if self._mongo_ok:
+            try:
+                self._collection.delete_one({"mac": mac})
+                print(f"[config] Eliminado de Mongo: {mac}")
+                return
+            except Exception as e:
+                print(f"[config] Error eliminando de Mongo: {e}")
+                self._collection = None
+                self._use_json = True
+
+        # Fallback devices.json
+        devices = self._load_devices_json()
+        if mac in devices:
+            del devices[mac]
+            self._save_devices_json(devices)
+            print(f"[config] Eliminado de devices.json: {mac}")

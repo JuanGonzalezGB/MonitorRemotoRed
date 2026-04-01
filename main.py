@@ -33,6 +33,7 @@ def main():
         on_force_scan=lambda: scanner.force_scan(),
         on_settings_change=lambda s, i, m: _on_settings_change(s, i, m),
         on_rename=lambda mac, name: config.set_device_name(mac, name),
+        on_delete=lambda mac: config.delete_device(mac),  # ← nuevo
         estilo=estilo
     )
 
