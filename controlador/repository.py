@@ -9,7 +9,7 @@ from pymongo import MongoClient
 
 _STALE_SECONDS = 300  # 5 min sin aparecer = offline
 
-
+"""
 def _get_scans_col(mongo_cfg: dict):
     user     = mongo_cfg.get("user", "")
     password = mongo_cfg.get("password", "")
@@ -22,13 +22,26 @@ def _get_scans_col(mongo_cfg: dict):
         f"mongodb://{host}:{port}/"
     )
     client = MongoClient(uri, serverSelectionTimeoutMS=3000)
-    return client[db_name]["scans"]
+    return client[db_name]["scans"]"""
 
+def _get_col(mongo_cfg: dict, collection: str):
+    user     = mongo_cfg.get("user", "")
+    password = mongo_cfg.get("password", "")
+    host     = mongo_cfg.get("host", "localhost")
+    port     = mongo_cfg.get("port", 27017)
+    db_name  = mongo_cfg.get("db", "scanner")
+    uri = (
+        f"mongodb://{user}:{password}@{host}:{port}/{db_name}?authSource=admin"
+        if user and password else
+        f"mongodb://{host}:{port}/"
+    )
+    client = MongoClient(uri, serverSelectionTimeoutMS=3000)
+    return client[db_name][collection]
 
 def get_devices(mongo_cfg: dict) -> list[Device]:
     """Lee scanner.scans y devuelve la lista de Device con estado online/offline."""
     try:
-        col = _get_scans_col(mongo_cfg)
+        col = _get_col(mongo_cfg, "scans")
         now = datetime.utcnow()
         devices = []
         for doc in col.find({}, {"_id": 0}):
@@ -53,7 +66,7 @@ def get_devices(mongo_cfg: dict) -> list[Device]:
 
 def get_last_scan_time(mongo_cfg: dict) -> str | None:
     try:
-        col = _get_scans_col(mongo_cfg)
+        col = _get_col(mongo_cfg,"scans")
         doc = col.find_one({}, {"last_seen": 1}, sort=[("last_seen", -1)])
         if doc and doc.get("last_seen"):
             return doc["last_seen"].strftime("%H:%M:%S")
@@ -73,7 +86,7 @@ def delete_device(mongo_cfg: dict, mac: str) -> None:
 def delete_dispositivo(mongo_cfg: dict, mac: str) -> None:
     """Elimina el nombre guardado de scanner.dispositivos."""
     try:
-        col = _get_scans_col(mongo_cfg, "dispositivos")
+        col = _get_col(mongo_cfg, "dispositivos")
         col.delete_one({"mac": mac.lower()})
         print(f"[repository] Eliminado de dispositivos: {mac}")
     except Exception as e:
@@ -83,7 +96,7 @@ def delete_dispositivo(mongo_cfg: dict, mac: str) -> None:
 def delete_scan(mongo_cfg: dict, mac: str) -> None:
     """Elimina el registro completo de scanner.scans."""
     try:
-        col = _get_scans_col(mongo_cfg, "scans")
+        col = _get_col(mongo_cfg, "scans")
         col.delete_one({"mac": mac.lower()})
         print(f"[repository] Eliminado de scanner.scans: {mac}")
     except Exception as e:
