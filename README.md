@@ -1,43 +1,92 @@
-#Monitor Red(LINUX/WINDOWS)
------------------------------
+# Monitor Red — rama servicios (Linux)
 
-#Instalar requisitos LINUX:
+El monitor de red lee los dispositivos detectados por el servicio `network-collector`, el cual escanea la red de forma continua e independiente a si la interfaz gráfica está abierta o no. La GUI solo lee y visualiza — no ejecuta scans directamente.
 
-     pip3 install -r reqlinux.txt
+---
 
------------------------------
+## Requisitos
 
-#Instalar requisitos WINDOWS:
+### Dependencias Python
 
-descargue nmap: https://nmap.org/ o:
+```bash
+pip3 install -r reqlinux.txt
+```
 
-     winget install nmap
+### Servicio network-collector
 
-luego:
+Esta rama requiere que el servicio `network-collector` esté corriendo en el sistema. El servicio usa `arp-scan` para detectar dispositivos en la red y persiste los resultados en MongoDB.
 
-     pip3 install -r reqwin.txt
+```bash
+sudo apt install arp-scan
+```
 
------------------------------
+Instalar el servicio:
 
-#uso de mongodb es opcional. 
+```bash
+sudo cp network-collector.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable network-collector
+sudo systemctl start network-collector
+```
 
-El programa está pensado para usar una base de datos mongodb para almacenar los dispositivos que se conecten a la red, sin embargo, de no haber una base de datos mongodb corriendo en localhost o en la red local, el programa guardará los dispositivos en 'devices.json', si luego decide instalar mongodb y hacer uso de esta para el programa, el programa migrará la información del JSON a su base de datos y se eliminará del sistema.
+### MongoDB
 
-Puede configurar ip, credenciales y nombre de la base de datos que quiere usar desde el programa o editando 'settings.json' el cual se creará en la primera ejecución del programa, también puede cambiar defaults en config.py para que este se cree con la configuración deseada.
+MongoDB es **requerido** en esta rama. El servicio escribe en `scanner.scans` y la GUI lee de ahí. Sin MongoDB el programa no funciona.
 
------------------------------
-#OPCIONAL
+```bash
+sudo apt install mongodb
+```
 
-Para instalar con pyinstaller desde Raspberry/Linux
+---
 
-    pyinstaller --onedir --add-data "scan_network.sh:." --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --name="Net Monitor Beta" main.py
+## Base de datos
 
-Para instalar con pyinstaller desde Windows:
-    
-    pyinstaller --onedir --hidden-import pymongo --hidden-import pymongo.mongo_client --hidden-import pymongo.collection --hidden-import bson --hidden-import bson.codec_options --hidden-import nmap --name="Net Monitor Beta" main.py
+El programa usa dos colecciones dentro de la base de datos `scanner`:
 
+- `scanner.scans` — escrita exclusivamente por el servicio `network-collector`. Contiene el historial de dispositivos detectados con MAC, IP, vendor y ping. No debe ser modificada manualmente.
+- `scanner.dispositivos` — escrita exclusivamente por esta GUI. Contiene los nombres personalizados asociados a cada MAC. Es leída también por otras apps del ecosistema (ej: pihole-monitor).
 
-This project includes code generated with assistance of AI tools and manually reviewed and modified by the author.
+Puede configurar la IP, credenciales y nombre de la base de datos desde la configuración del programa (ícono ⚙) o editando `config.json`, el cual se creará en la primera ejecución.
 
-Este proyecto incluye código generado con asistencia de herramientas de IA, manualmente revisado y modificado por el autor.
+---
 
+## Intervalo de scan
+
+El intervalo de scan se controla desde la configuración del programa. Al cambiar este valor se actualiza automáticamente el `.env` del servicio y se reinicia `network-collector` para aplicar el nuevo intervalo.
+
+Para que el reinicio del servicio funcione sin contraseña, agregue esta regla:
+
+```bash
+sudo visudo -f /etc/sudoers.d/network-collector
+```
+
+```
+tuusuario ALL=(ALL) NOPASSWD: /bin/systemctl restart network-collector
+```
+
+---
+
+## Comportamiento
+
+- La lista muestra **todos los dispositivos** que el servicio ha detectado alguna vez, marcando como offline los que no se han visto en los últimos 5 minutos.
+- El botón **Scan** refresca la lectura desde MongoDB de forma inmediata.
+- Los dispositivos pueden **renombrarse** haciendo clic en su nombre. El nombre queda asociado a la MAC y persiste entre sesiones.
+- Los dispositivos pueden **eliminarse** desde el mismo diálogo de renombrado (ícono 🗑). Se puede eliminar solo el nombre guardado, o también el registro completo de `scanner.scans`.
+
+---
+
+## Compilar con PyInstaller
+
+```bash
+pyinstaller --onedir \
+  --hidden-import pymongo \
+  --hidden-import pymongo.mongo_client \
+  --hidden-import pymongo.collection \
+  --hidden-import bson \
+  --hidden-import bson.codec_options \
+  --name="Net Monitor" main.py
+```
+
+---
+
+*Este proyecto incluye código generado con asistencia de herramientas de IA, manualmente revisado y modificado por el autor.*
