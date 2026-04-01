@@ -293,15 +293,15 @@ class Dashboard(tk.Tk):
             row["lbl_ip"].config(text=row["ip"][:COL_IP], fg=self.estilo.blue)
             row["lbl_ip"]._fg_rol = "blue"
 
-def _open_rename(self, mac: str):
-    ip      = self.rows[mac]["ip"]
-    current = self.config.device_name(mac) or mac
-    RenameDialog(
-        self, mac, ip, current,
-        on_save=self._handle_rename,
-        on_delete=self._handle_delete,
-        estilo=EstiloFactory.definirEstilo(self.config.theme),
-    )
+    def _open_rename(self, mac: str):
+        ip      = self.rows[mac]["ip"]
+        current = self.config.device_name(mac) or mac
+        RenameDialog(
+            self, mac, ip, current,
+            on_save=self._handle_rename,
+            on_delete=self._handle_delete,
+            estilo=EstiloFactory.definirEstilo(self.config.theme),
+        )
 
     def _handle_rename(self, mac: str, name: str):
         self.on_rename(mac, name)
