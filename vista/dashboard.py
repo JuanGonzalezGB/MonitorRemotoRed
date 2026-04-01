@@ -324,7 +324,7 @@ class Dashboard(tk.Tk):
 
     def _open_speed(self, mac: str):
         ip = self.rows[mac]["ip"]
-        label = self.config.device_name(mac) or ip.split(".")[-1]
+        label = self.config.device_name(mac) or mac
         SpeedPanel(EstiloFactory.definirEstilo(self.config.theme), self, label, ip, mac, self.bw)
 
     def _open_host_speed(self):
