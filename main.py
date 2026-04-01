@@ -1,75 +1,57 @@
-# SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 Juan S.G. Castellanos
-
 """
-main.py — punto de entrada, conecta modelo, controlador y vista
+main.py — punto de entrada
+- Dispositivos en tiempo real: lee scanner.scans via repository (collector los escribe)
+- Nombres de dispositivos:     lee/escribe scanner.dispositivos via Config
 """
 import sys
 from modelo.config import Config
-from modelo.state_cache import StateCache
 from modelo.bandwidth import BandwidthMonitor
 from controlador.network import preflight
-from controlador.scanner import ScannerController
+import controlador.repository as repo
 from vista.dashboard import Dashboard
-from estilo import estiloFactory
+from estilo.estiloFactory import EstiloFactory
+from rpicore.config import REFRESH_MS
 
 
 def main():
     if not preflight():
         sys.exit(1)
+
     config = Config()
-    tema = config.theme
-
-    estilo = estiloFactory.EstiloFactory.definirEstilo(tema)
-
-    #config = Config()
-    cache  = StateCache()
     bw     = BandwidthMonitor()
+    estilo = EstiloFactory.definirEstilo(config.theme)
 
-    # Vista — se crea antes del scanner para poder llamar .after()
-    app = Dashboard(
-        config=config,
-        bw=bw,
-        on_force_scan=lambda: scanner.force_scan(),
-        on_settings_change=lambda s, i, m: _on_settings_change(s, i, m),
-        on_rename=lambda mac, name: config.set_device_name(mac, name),
-        estilo=estilo
-    )
+    def on_rename(mac: str, name: str):
+        config.set_device_name(mac, name)  # Config escribe en scanner.dispositivos
 
-    def _on_scan_result(devices):
-        cache.update(devices, config)
-        app.after(0, lambda d=devices: _refresh(d))
-
-    def _refresh(devices):
-        app.refresh_ui(devices)      # ← detecta online Y offline
-        app.update_counts(devices)
-        app.set_scanning(False)
-
-    def _on_settings_change(subnet: str, interval: int, mongo: dict):
+    def on_settings_change(subnet: str, interval: int, mongo: dict):
         config.subnet = subnet
         config.scan_interval = interval
-        config.mongo = mongo
-        scanner.interval = interval
-        scanner.force_scan()
+        config.mongo = mongo               # reconecta Mongo si cambian credenciales
 
-    scanner = ScannerController(
-        get_subnet=lambda: config.subnet,
-        interval=config.scan_interval,
-        on_result=_on_scan_result,
+    app = Dashboard(
+        estilo=estilo,
+        config=config,
+        bw=bw,
+        on_force_scan=lambda: poll_mongo(),
+        on_settings_change=on_settings_change,
+        on_rename=on_rename,
     )
 
-    # Notificar estado de scan a la vista
-    original_do_scan = scanner._do_scan
-    def _wrapped_scan():
-        app.after(0, lambda: app.set_scanning(True))
-        original_do_scan()
-    scanner._do_scan = _wrapped_scan
+    def poll_mongo():
+        try:
+            devices = repo.get_devices(config.mongo)
+            app.refresh_ui(devices)
+            app.update_counts(devices)
+        except Exception as e:
+            app.lbl_last.config(text=f"error: {e}")
+        finally:
+            app.after(REFRESH_MS, poll_mongo)
 
     bw.start()
-    scanner.start()
+    app.after(REFRESH_MS, poll_mongo)
     app.mainloop()
     bw.stop()
-    scanner.stop()
 
 
 if __name__ == "__main__":
