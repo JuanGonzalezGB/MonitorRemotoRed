@@ -44,7 +44,6 @@ def get_devices(mongo_cfg: dict) -> list[Device]:
                 mac=mac,
                 vendor=doc.get("vendor", ""),
                 ping_ms=doc.get("ping_ms") if online else None,
-                online=online,
             ))
         return devices
     except Exception as e:
