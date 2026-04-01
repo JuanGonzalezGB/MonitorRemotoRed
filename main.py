@@ -3,6 +3,8 @@ main.py — punto de entrada
 - Dispositivos en tiempo real: lee scanner.scans via repository (collector los escribe)
 - Nombres de dispositivos:     lee/escribe scanner.dispositivos via Config
 """
+import re
+import subprocess
 import sys
 from modelo.config import Config
 from modelo.bandwidth import BandwidthMonitor
@@ -11,6 +13,38 @@ import controlador.repository as repo
 from vista.dashboard import Dashboard
 from estilo.estiloFactory import EstiloFactory
 from rpicore.config import REFRESH_MS
+
+_ENV_PATH = "/home/gurthbrannon/rasphole/Source/rpi-core/.env"
+
+
+def _update_env_interval(seconds: int) -> None:
+    """Reemplaza SCAN_INTERVAL_S en el .env sin tocar el resto."""
+    try:
+        with open(_ENV_PATH, "r") as f:
+            content = f.read()
+        content = re.sub(
+            r"^SCAN_INTERVAL_S=.*$",
+            f"SCAN_INTERVAL_S={seconds}",
+            content,
+            flags=re.MULTILINE,
+        )
+        with open(_ENV_PATH, "w") as f:
+            f.write(content)
+        print(f"[main] SCAN_INTERVAL_S={seconds} guardado en .env")
+    except Exception as e:
+        print(f"[main] Error editando .env: {e}")
+
+
+def _restart_collector() -> None:
+    """Reinicia el servicio para que lea el nuevo intervalo."""
+    try:
+        subprocess.run(
+            ["sudo", "systemctl", "restart", "network-collector"],
+            check=True, timeout=10,
+        )
+        print("[main] network-collector reiniciado")
+    except Exception as e:
+        print(f"[main] Error reiniciando servicio: {e}")
 
 
 def main():
@@ -22,12 +56,13 @@ def main():
     estilo = EstiloFactory.definirEstilo(config.theme)
 
     def on_rename(mac: str, name: str):
-        config.set_device_name(mac, name)  # Config escribe en scanner.dispositivos
+        config.set_device_name(mac, name)
 
     def on_settings_change(subnet: str, interval: int, mongo: dict):
         config.subnet = subnet
-        config.scan_interval = interval
-        config.mongo = mongo               # reconecta Mongo si cambian credenciales
+        config.mongo  = mongo
+        _update_env_interval(interval)
+        _restart_collector()
 
     app = Dashboard(
         estilo=estilo,
