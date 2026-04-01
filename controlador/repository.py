@@ -7,7 +7,7 @@ from datetime import datetime
 from modelo.device import Device
 from pymongo import MongoClient
 
-_STALE_SECONDS = 20 
+_STALE_SECONDS = 10 
 
 def _get_col(mongo_cfg: dict, collection: str):
     user     = mongo_cfg.get("user", "")
