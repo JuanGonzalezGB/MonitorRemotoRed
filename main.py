@@ -62,6 +62,10 @@ def main():
         _update_env_interval(interval)   # guarda en .env del servicio
         _restart_collector()
 
+    def on_delete(mac: str):
+        config.set_device_name(mac, "")   # limpia nombre en Config
+        repo.delete_device(config.mongo, mac)
+
     app = Dashboard(
         estilo=estilo,
         config=config,
@@ -69,8 +73,8 @@ def main():
         on_force_scan=lambda: poll_mongo(),
         on_settings_change=on_settings_change,
         on_rename=on_rename,
+        on_delete=on_delete,          # ← nuevo
     )
-
     def poll_mongo():
         try:
             devices = repo.get_devices(config.mongo)
