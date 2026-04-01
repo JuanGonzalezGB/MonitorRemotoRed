@@ -7,22 +7,7 @@ from datetime import datetime
 from modelo.device import Device
 from pymongo import MongoClient
 
-_STALE_SECONDS = 300  # 5 min sin aparecer = offline
-
-"""
-def _get_scans_col(mongo_cfg: dict):
-    user     = mongo_cfg.get("user", "")
-    password = mongo_cfg.get("password", "")
-    host     = mongo_cfg.get("host", "localhost")
-    port     = mongo_cfg.get("port", 27017)
-    db_name  = mongo_cfg.get("db", "scanner")
-    uri = (
-        f"mongodb://{user}:{password}@{host}:{port}/{db_name}?authSource=admin"
-        if user and password else
-        f"mongodb://{host}:{port}/"
-    )
-    client = MongoClient(uri, serverSelectionTimeoutMS=3000)
-    return client[db_name]["scans"]"""
+_STALE_SECONDS = 120 
 
 def _get_col(mongo_cfg: dict, collection: str):
     user     = mongo_cfg.get("user", "")
