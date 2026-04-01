@@ -60,11 +60,31 @@ def get_last_scan_time(mongo_cfg: dict) -> str | None:
     except Exception:
         pass
     return None
+"""
 def delete_device(mongo_cfg: dict, mac: str) -> None:
-    """Elimina un dispositivo de scanner.dispositivos."""
+    #Elimina un dispositivo de scanner.dispositivos.
     try:
         col = _get_col(mongo_cfg, "dispositivos")
         col.delete_one({"mac": mac.lower()})
         print(f"[repository] Eliminado de dispositivos: {mac}")
     except Exception as e:
-        print(f"[repository] Error eliminando dispositivo: {e}")
+        print(f"[repository] Error eliminando dispositivo: {e}")"""
+
+def delete_dispositivo(mongo_cfg: dict, mac: str) -> None:
+    """Elimina el nombre guardado de scanner.dispositivos."""
+    try:
+        col = _get_col(mongo_cfg, "dispositivos")
+        col.delete_one({"mac": mac.lower()})
+        print(f"[repository] Eliminado de dispositivos: {mac}")
+    except Exception as e:
+        print(f"[repository] Error eliminando de dispositivos: {e}")
+
+
+def delete_scan(mongo_cfg: dict, mac: str) -> None:
+    """Elimina el registro completo de scanner.scans."""
+    try:
+        col = _get_col(mongo_cfg, "scans")
+        col.delete_one({"mac": mac.lower()})
+        print(f"[repository] Eliminado de scanner.scans: {mac}")
+    except Exception as e:
+        print(f"[repository] Error eliminando de scanner.scans: {e}")

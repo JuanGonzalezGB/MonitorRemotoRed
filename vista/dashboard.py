@@ -31,7 +31,7 @@ class Dashboard(tk.Tk):
                  on_force_scan: Callable,
                  on_settings_change: Callable[[str, int, dict], None],
                  on_rename: Callable[[str, str], None],
-                 on_delete: Callable[[str], None]):
+                 on_delete: Callable[[str, bool], None]):
         super().__init__()
         self.estilo = estilo
         self.config = config
@@ -308,9 +308,9 @@ class Dashboard(tk.Tk):
         if mac in self.rows:
             self.rows[mac]["name"].config(text=name[:COL_NAME])
 
-    def _handle_delete(self, mac: str):
-        self.on_delete(mac)
-        if mac in self.rows:
+    def _handle_delete(self, mac: str, delete_scan: bool):
+        self.on_delete(mac, delete_scan)
+        if delete_scan and mac in self.rows:
             self.rows[mac]["frame"].destroy()
             del self.rows[mac]
             del self._show_mac[mac]

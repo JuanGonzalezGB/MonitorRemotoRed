@@ -70,13 +70,23 @@ class RenameDialog(tk.Toplevel):
     def _confirm_delete(self):
         ConfirmDialog(
             self,
-            message=f"¿Eliminar {self.ip}\n({self.mac})?",
-            on_confirm=self._delete,
+            message=f"¿Eliminar nombre guardado\nde {self.ip} ({self.mac})\nde dispositivos?",
+            on_confirm=self._delete_dispositivo,
             estilo=self.estilo,
         )
 
-    def _delete(self):
-        self.on_delete(self.mac)
+    def _delete_dispositivo(self):
+        self.on_delete(self.mac, delete_scan=False)
+        # segundo dialogo
+        ConfirmDialog(
+            self,
+            message=f"¿Eliminar también\n{self.ip} ({self.mac})\nde scanner.scans?\nDesaparecerá de la lista.",
+            on_confirm=self._delete_scan,
+            estilo=self.estilo,
+        )
+
+    def _delete_scan(self):
+        self.on_delete(self.mac, delete_scan=True)
         self.destroy()
 
     def _save(self):
