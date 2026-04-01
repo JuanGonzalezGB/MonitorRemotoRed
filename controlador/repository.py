@@ -73,7 +73,7 @@ def delete_device(mongo_cfg: dict, mac: str) -> None:
 def delete_dispositivo(mongo_cfg: dict, mac: str) -> None:
     """Elimina el nombre guardado de scanner.dispositivos."""
     try:
-        col = _get_col(mongo_cfg, "dispositivos")
+        col = _get_scans_col(mongo_cfg, "dispositivos")
         col.delete_one({"mac": mac.lower()})
         print(f"[repository] Eliminado de dispositivos: {mac}")
     except Exception as e:
@@ -83,7 +83,7 @@ def delete_dispositivo(mongo_cfg: dict, mac: str) -> None:
 def delete_scan(mongo_cfg: dict, mac: str) -> None:
     """Elimina el registro completo de scanner.scans."""
     try:
-        col = _get_col(mongo_cfg, "scans")
+        col = _get_scans_col(mongo_cfg, "scans")
         col.delete_one({"mac": mac.lower()})
         print(f"[repository] Eliminado de scanner.scans: {mac}")
     except Exception as e:
