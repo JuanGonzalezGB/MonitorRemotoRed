@@ -46,7 +46,7 @@ class Dashboard(tk.Tk):
         self._local_ip = get_local_ip()
 
         self.title("Net Monitor")
-        self.geometry("480x280")
+        self.geometry("480x260")
         self.resizable(False, True)
         self.maxsize(480, 300)
         self.configure(bg=self.estilo.bg)
