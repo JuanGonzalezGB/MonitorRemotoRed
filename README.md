@@ -12,6 +12,15 @@ El monitor de red lee los dispositivos detectados por el servicio `network-colle
 pip3 install -r reqlinux.txt
 ```
 
+### Speedtest
+
+también puede instalar el speedtest de ookla para realizar speedtest en segundo plano que se verá reflejado en speed panel
+```bash
+sudo apt-get install curl
+curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+sudo apt-get install speedtest
+```
+
 ### rpi-core
 
 Este programa forma parte de un ecosistema de aplicaciones que comparten la librería `rpi-core`. Dicha librería provee utilidades comunes (widgets, estilos, acceso a base de datos, configuración compartida) y es instalada como dependencia editable:
