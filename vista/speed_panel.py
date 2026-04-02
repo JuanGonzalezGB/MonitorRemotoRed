@@ -59,10 +59,10 @@ class SpeedPanel(tk.Toplevel):
         stats = tk.Frame(self, bg=self.estilo.bg)
         stats.pack(fill="x", padx=10, pady=(6, 2))
         self.lbl_rx = tk.Label(stats, text="↓  0.0 KB/s", bg=self.estilo.bg,
-                               fg=self.estilo.green, font=("monospace", 10))
+                               fg=self.estilo.cyan, font=("monospace", 10))
         self.lbl_rx.pack(side="left", padx=(0, 20))
         self.lbl_tx = tk.Label(stats, text="↑  0.0 KB/s", bg=self.estilo.bg,
-                               fg=self.estilo.cyan, font=("monospace", 10))
+                               fg=self.estilo.red, font=("monospace", 10))
         self.lbl_tx.pack(side="left")
         tk.Label(stats, text="(este equipo)", bg=self.estilo.bg, fg=self.estilo.muted,
                  font=F_SMALL).pack(side="right")
@@ -76,7 +76,7 @@ class SpeedPanel(tk.Toplevel):
         rx_col = tk.Frame(leg, bg=self.estilo.bg)
         rx_col.pack(side="left")
         self.lbl_rx_mbps = tk.Label(rx_col, text="— descarga  0.0 Mbps",
-                                     bg=self.estilo.bg, fg=self.estilo.green, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL)
         self.lbl_rx_mbps.pack(anchor="w")
         self.lbl_rx_peak = tk.Label(rx_col, text="  peak  0.0 Mbps",
                                      bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
@@ -85,7 +85,7 @@ class SpeedPanel(tk.Toplevel):
         tx_col = tk.Frame(leg, bg=self.estilo.bg)
         tx_col.pack(side="left", padx=12)
         self.lbl_tx_mbps = tk.Label(tx_col, text="— subida  0.0 Mbps",
-                                     bg=self.estilo.bg, fg=self.estilo.cyan, font=F_SMALL)
+                                     bg=self.estilo.bg, fg=self.estilo.red, font=F_SMALL)
         self.lbl_tx_mbps.pack(anchor="w")
         self.lbl_tx_peak = tk.Label(tx_col, text="  peak  0.0 Mbps",
                                      bg=self.estilo.bg, fg=self.estilo.muted, font=F_SMALL)
@@ -139,8 +139,8 @@ class SpeedPanel(tk.Toplevel):
             self.canvas.create_line(2, y, GRAPH_W - 2, y,
                                     fill=self.estilo.border, width=1)
 
-        draw_line(rx_hist, self.estilo.green)
-        draw_line(tx_hist, self.estilo.cyan)
+        draw_line(rx_hist, self.estilo.cyan)
+        draw_line(tx_hist, self.estilo.red)
         self.canvas.create_text(GRAPH_W - 4, 4, text=fmt_kbs(max_val),
                                 fill=self.estilo.muted, font=F_SMALL, anchor="ne")
 
