@@ -33,55 +33,23 @@ def _find_arp_scan() -> str | None:
     return None
 
 
-def _sudo_configured(arp_path: str) -> bool:
-    result = subprocess.run(
-        ["sudo", "-n", arp_path, "--help"],
-        capture_output=True
-    )
-    return result.returncode == 0
-
-
-def _setup_sudoers(arp_path: str) -> bool:
-    user = os.environ.get("SUDO_USER") or os.environ.get("USER") or os.getlogin()
-    rule = f"{user} ALL=(ALL) NOPASSWD: {arp_path}\n"
-    sudoers_file = "/etc/sudoers.d/net_monitor"
-
-    print("Primera ejecución: configurando permisos para arp-scan...")
-    print(f"  Regla: {rule.strip()}")
-    print("  (Ingresá tu contraseña de sudo — solo esta vez)\n")
-
-    result = subprocess.run(
-        ["sudo", "tee", sudoers_file],
-        input=rule.encode(), capture_output=True
-    )
-    if result.returncode != 0:
-        print(f"[network] Error escribiendo sudoers: {result.stderr.decode()}")
-        return False
-
-    subprocess.run(["sudo", "chmod", "440", sudoers_file], check=True)
-    verify = subprocess.run(
-        ["sudo", "visudo", "-c", "-f", sudoers_file],
-        capture_output=True
-    )
-    if verify.returncode != 0:
-        subprocess.run(["sudo", "rm", sudoers_file])
-        return False
-
-    print("Permisos configurados. No se volverá a pedir.\n")
-    return True
-
-
 def _preflight_linux() -> bool:
     arp_path = _find_arp_scan()
     if not arp_path:
         print("ERROR: arp-scan no está instalado.")
         print("  Instalalo con: sudo apt install arp-scan")
         return False
-    if not _sudo_configured(arp_path):
-        ok = _setup_sudoers(arp_path)
-        if not ok or not _sudo_configured(arp_path):
-            print("ERROR: no se pudo configurar sudo.")
-            return False
+
+    # Verificar capabilities en lugar de sudo
+    result = subprocess.run(
+        ["getcap", arp_path],
+        capture_output=True, text=True
+    )
+    if "cap_net_raw" not in result.stdout:
+        print("ERROR: arp-scan no tiene las capabilities necesarias.")
+        print(f"  Ejecuta: sudo setcap cap_net_raw,cap_net_admin=eip {arp_path}")
+        return False
+
     return True
 
 
