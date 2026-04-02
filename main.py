@@ -33,17 +33,6 @@ def _update_env_interval(seconds: int) -> None:
         print(f"[main] Error editando .env: {e}")
 
 
-def _restart_collector() -> None:
-    try:
-        subprocess.run(
-            ["sudo", "systemctl", "restart", "network-collector"],
-            check=True, timeout=10,
-        )
-        print("[main] network-collector reiniciado")
-    except Exception as e:
-        print(f"[main] Error reiniciando servicio: {e}")
-
-
 def main():
     if not preflight():
         sys.exit(1)
@@ -56,11 +45,10 @@ def main():
         config.set_device_name(mac, name)
 
     def on_settings_change(subnet: str, interval: int, mongo: dict):
-        config.subnet    = subnet
-        config.scan_interval = interval  # guarda en config.json
-        config.mongo     = mongo
-        _update_env_interval(interval)   # guarda en .env del servicio
-        _restart_collector()
+        config.subnet        = subnet
+        config.scan_interval = interval
+        config.mongo         = mongo
+        _update_env_interval(interval)  # solo escribe el .env, sin restart
 
     def on_delete(mac: str, delete_scan: bool):
         repo.delete_dispositivo(config.mongo, mac)
