@@ -35,7 +35,7 @@ while IFS=$'\t' read -r ip mac vendor; do
 
     VENDOR_SAFE=$(echo "$vendor" | sed 's/"/\\"/g; s/\\/\\\\/g')
     RESULTS+=("{\"ip\":\"$ip\",\"mac\":\"$mac\",\"vendor\":\"$VENDOR_SAFE\",\"ping_ms\":$PING_VAL}")
-done < <(sudo "$ARP_SCAN" ${IFACE:+--interface="$IFACE"} "$SUBNET" 2>/dev/null | grep -E "^[0-9]")
+done < <("$ARP_SCAN" ${IFACE:+--interface="$IFACE"} "$SUBNET" 2>/dev/null | grep -E "^[0-9]")
 
 if [ ${#RESULTS[@]} -eq 0 ]; then
     echo "[]"
