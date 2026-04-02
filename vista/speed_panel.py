@@ -27,14 +27,15 @@ def fmt_kbs(kbs: float) -> str:
 
 class SpeedPanel(tk.Toplevel):
     def __init__(self, estilo, parent, label: str, ip: str,
-                 mac: str, bw: BandwidthMonitor):
+                mac: str, bw: BandwidthMonitor):
         super().__init__(parent)
         self.estilo = estilo
         self.bw = bw
         self.ip = ip
         self._running = True
-        self._peak_rx = 0.0
-        self._peak_tx = 0.0
+        # ── ya no inicializa peak en 0 — lo toma del monitor ──
+        # self._peak_rx = 0.0   ← eliminar
+        # self._peak_tx = 0.0   ← eliminar
 
         self.overrideredirect(True)
         self.configure(bg=self.estilo.bg)
@@ -92,20 +93,23 @@ class SpeedPanel(tk.Toplevel):
         tk.Button(leg, text="Cerrar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=8,
                   command=self._close).pack(side="right")
+        tk.Button(leg, text="reset peak", bg=self.estilo.bg2, fg=self.estilo.muted,
+          font=F_SMALL, relief="flat", bd=0, padx=8,
+          command=self.bw.reset_peak).pack(side="right", padx=(0, 8))
 
     def _update(self):
         if not self._running:
             return
         rx, tx = self.bw.current()
         rx_hist, tx_hist = self.bw.history()
+        peak_rx, peak_tx = self.bw.peak()          # ← lee del monitor
+
         self.lbl_rx.config(text=f"↓  {fmt_kbs(rx)}")
         self.lbl_tx.config(text=f"↑  {fmt_kbs(tx)}")
-        self._peak_rx = max(self._peak_rx, rx)
-        self._peak_tx = max(self._peak_tx, tx)
         self.lbl_rx_mbps.config(text=f"— descarga  {fmt_mbps(rx)}")
         self.lbl_tx_mbps.config(text=f"— subida  {fmt_mbps(tx)}")
-        self.lbl_rx_peak.config(text=f"  peak  {fmt_mbps(self._peak_rx)}")
-        self.lbl_tx_peak.config(text=f"  peak  {fmt_mbps(self._peak_tx)}")
+        self.lbl_rx_peak.config(text=f"  peak  {fmt_mbps(peak_rx)}")  # ← usa peak del monitor
+        self.lbl_tx_peak.config(text=f"  peak  {fmt_mbps(peak_tx)}")  # ← usa peak del monitor
         self._draw_graph(rx_hist, tx_hist)
         self.after(1000, self._update)
 

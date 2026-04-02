@@ -58,6 +58,8 @@ class BandwidthMonitor:
         self._lock = threading.Lock()
         self._rx_hist: list[float] = []
         self._tx_hist: list[float] = []
+        self._peak_rx: float = 0.0      # ← nuevo
+        self._peak_tx: float = 0.0      # ← nuevo
         self._prev: tuple[int, int] | None = None
         self._prev_time: float = 0.0
         self._running = False
@@ -85,6 +87,10 @@ class BandwidthMonitor:
                             self._rx_hist.pop(0)
                         if len(self._tx_hist) > self.HISTORY:
                             self._tx_hist.pop(0)
+                        if rx > self._peak_rx:      # ← nuevo
+                            self._peak_rx = rx
+                        if tx > self._peak_tx:      # ← nuevo
+                            self._peak_tx = tx
             self._prev = stats
             self._prev_time = now
             time.sleep(1)
@@ -98,3 +104,12 @@ class BandwidthMonitor:
     def history(self) -> tuple[list[float], list[float]]:
         with self._lock:
             return list(self._rx_hist), list(self._tx_hist)
+
+    def peak(self) -> tuple[float, float]:       # ← nuevo
+        with self._lock:
+            return self._peak_rx, self._peak_tx
+
+    def reset_peak(self):                        # ← nuevo
+        with self._lock:
+            self._peak_rx = 0.0
+            self._peak_tx = 0.0
