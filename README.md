@@ -3,7 +3,13 @@
 
 #Instalar requisitos LINUX:
 
-     pip3 install -r reqlinux.txt
+Puede instalar el speedtest de ookla para realizar speedtest en segundo plano que se verá reflejado en speed panel
+
+      sudo apt-get install curl
+      curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+      sudo apt-get install speedtest
+
+      pip3 install -r reqlinux.txt
 
 -----------------------------
 
@@ -27,6 +33,8 @@ Puede configurar ip, credenciales y nombre de la base de datos que quiere usar d
 
 -----------------------------
 #OPCIONAL
+
+
 
 Para instalar con pyinstaller desde Raspberry/Linux
 
