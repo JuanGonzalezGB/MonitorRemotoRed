@@ -93,12 +93,12 @@ class SpeedPanel(tk.Toplevel):
         tk.Button(leg, text="Cerrar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=8,
                   command=self._close).pack(side="right")
-        tk.Button(leg, text="reset peak", bg=self.estilo.bg2, fg=self.estilo.muted,
+        tk.Button(leg, text="Clean", bg=self.estilo.bg2, fg=self.estilo.muted,
           font=F_SMALL, relief="flat", bd=0, padx=8,
           command=self.bw.reset_peak).pack(side="right", padx=(0, 8))
         
             
-        tk.Button(leg, text="speedtest", bg=self.estilo.bg2, fg=self.estilo.muted,
+        tk.Button(leg, text="SpeedTest", bg=self.estilo.bg2, fg=self.estilo.muted,
         font=F_SMALL, relief="flat", bd=0, padx=8,
         command=lambda: self._speedtest()).pack(side="left", padx=(0, 8))  
     
@@ -108,7 +108,7 @@ class SpeedPanel(tk.Toplevel):
             subprocess.Popen(["speedtest"])
         except:
             print("uff bro instala speedtest de ookla")  
-            
+
     def _update(self):
         if not self._running:
             return
