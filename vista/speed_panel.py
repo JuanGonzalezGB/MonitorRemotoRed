@@ -6,6 +6,7 @@ view/speed_panel.py — panel flotante de velocidad del host
 import tkinter as tk
 from modelo.bandwidth import BandwidthMonitor
 from vista.gui_dictionary import FORMATS, GRAPHFORMAT
+import subprocess
 
 F_NORMAL = FORMATS["F_NORMAL"]
 F_SMALL  = FORMATS["F_SMALL"]
@@ -93,10 +94,20 @@ class SpeedPanel(tk.Toplevel):
         tk.Button(leg, text="Cerrar", bg=self.estilo.bg2, fg=self.estilo.muted,
                   font=F_SMALL, relief="flat", bd=0, padx=8,
                   command=self._close).pack(side="right")
-        tk.Button(leg, text="reset peak", bg=self.estilo.bg2, fg=self.estilo.muted,
+        tk.Button(leg, text="Clean", bg=self.estilo.bg2, fg=self.estilo.muted,
           font=F_SMALL, relief="flat", bd=0, padx=8,
           command=self.bw.reset_peak).pack(side="right", padx=(0, 8))
-
+        
+        tk.Button(leg, text="SpeedTest", bg=self.estilo.bg2, fg=self.estilo.muted,
+        font=F_SMALL, relief="flat", bd=0, padx=8,
+        command=lambda: self._speedtest()).pack(side="left", padx=(0, 8))  
+    
+    def _speedtest(self):
+        try:
+            print("intentando speedtest")
+            subprocess.Popen(["speedtest"])
+        except:
+            print("uff bro instala speedtest de ookla")  
     def _update(self):
         if not self._running:
             return
