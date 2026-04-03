@@ -5,9 +5,7 @@
 
 Puede instalar el speedtest de ookla para realizar speedtest en segundo plano que se verá reflejado en speed panel
 
-      sudo apt-get install curl
-      curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-      sudo apt-get install speedtest
+https://www.speedtest.net/apps/cli
 
       pip3 install -r reqlinux.txt
 
